@@ -4,6 +4,7 @@ import { DayLesson, ProfileConfig, SiblingProgress } from '../types';
 import { audioPlayer } from '../services/audioPlayer';
 import { formatDialogueText } from '../services/storage';
 import { getSisterMemory, getIstpRank, getIsfjHeroRank } from '../services/gamification';
+import { ActivityHeatmap } from './ActivityHeatmap';
 
 interface LockoutScreenProps {
   lesson: DayLesson;
@@ -160,6 +161,9 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
           </div>
         </div>
       </div>
+
+      {/* 60-Day Habit & Activity Heatmap */}
+      <ActivityHeatmap progress={progress} theme={config.theme} />
 
       {/* ============================================================ */}
       {/* PERSONALIZED GAMIFICATION CARD FOR PROFILE */}

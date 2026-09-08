@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Volume2, CheckCircle2, ArrowRight, Sparkles, Zap, Shield, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DayLesson, ProfileConfig } from '../types';
@@ -35,6 +35,11 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   const [hasError, setHasError] = useState<boolean>(false);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [isPartnerTyping, setIsPartnerTyping] = useState<boolean>(false);
+  const [draggedWordIdx, setDraggedWordIdx] = useState<number | null>(null);
+  const [dragOverWordIdx, setDragOverWordIdx] = useState<number | null>(null);
+  const touchStartPos = useRef<{ x: number; y: number } | null>(null);
+  const isTouchDragging = useRef<boolean>(false);
+  const lastTouchTime = useRef<number>(0);
 
   const turn1 = lesson.dialogue[0]; // Partner
   const turn2 = lesson.dialogue[1]; // User challenge
@@ -99,6 +104,92 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     setSelectedWords(newSelected);
     setAvailableWords([...availableWords, word]);
     setHasError(false);
+  };
+
+  const reorderSelectedWords = (fromIdx: number, toIdx: number) => {
+    if (fromIdx === toIdx || fromIdx < 0 || toIdx < 0) return;
+    soundFX.playTap();
+    setSelectedWords((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, moved);
+      return next;
+    });
+    setHasError(false);
+  };
+
+  const handleDragStartWord = (index: number, e: React.DragEvent) => {
+    e.dataTransfer.setData('text/plain', String(index));
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedWordIdx(index);
+    setDragOverWordIdx(index);
+  };
+
+  const handleDragOverWord = (index: number, e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverWordIdx !== index) {
+      setDragOverWordIdx(index);
+    }
+  };
+
+  const handleDropWord = (index: number, e: React.DragEvent) => {
+    e.preventDefault();
+    const fromIdx = Number(e.dataTransfer.getData('text/plain'));
+    if (!isNaN(fromIdx) && fromIdx !== index) {
+      reorderSelectedWords(fromIdx, index);
+    }
+    setDraggedWordIdx(null);
+    setDragOverWordIdx(null);
+  };
+
+  const handleTouchStartWord = (index: number, e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartPos.current = { x: touch.clientX, y: touch.clientY };
+    isTouchDragging.current = false;
+    setDraggedWordIdx(index);
+    setDragOverWordIdx(index);
+  };
+
+  const handleTouchMoveWord = (e: React.TouchEvent) => {
+    if (draggedWordIdx === null || !touchStartPos.current) return;
+    const touch = e.touches[0];
+    const dist = Math.hypot(
+      touch.clientX - touchStartPos.current.x,
+      touch.clientY - touchStartPos.current.y
+    );
+    if (dist > 7) {
+      isTouchDragging.current = true;
+    }
+
+    if (isTouchDragging.current) {
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      const targetChip = el?.closest('[data-selected-word-idx]');
+      if (targetChip) {
+        const targetIdx = Number(targetChip.getAttribute('data-selected-word-idx'));
+        if (!isNaN(targetIdx) && targetIdx !== dragOverWordIdx) {
+          setDragOverWordIdx(targetIdx);
+        }
+      }
+    }
+  };
+
+  const handleTouchEndWord = (index: number, word: string) => {
+    lastTouchTime.current = Date.now();
+    if (
+      isTouchDragging.current &&
+      draggedWordIdx !== null &&
+      dragOverWordIdx !== null &&
+      draggedWordIdx !== dragOverWordIdx
+    ) {
+      reorderSelectedWords(draggedWordIdx, dragOverWordIdx);
+    } else if (!isTouchDragging.current) {
+      handleWordDeselect(word, index);
+    }
+    setDraggedWordIdx(null);
+    setDragOverWordIdx(null);
+    touchStartPos.current = null;
+    isTouchDragging.current = false;
   };
 
   const handleCheckWordOrder = () => {
@@ -364,27 +455,58 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                   {turn2.challenge?.type === 'word_order' && (
                     <div className="space-y-3">
                       {/* Target Slot */}
-                      <div
-                        className={`min-h-12 p-2.5 rounded-xl border border-dashed flex flex-wrap gap-1.5 items-center transition-all ${
-                          hasError
-                            ? 'border-rose-500 bg-rose-950/20'
-                            : 'border-slate-700 bg-slate-950/60'
-                        }`}
-                      >
-                        {selectedWords.length === 0 ? (
-                          <span className="text-xs text-slate-500 italic">
-                            Доорх үгсээс дарж сонгоно уу...
-                          </span>
-                        ) : (
-                          selectedWords.map((word, idx) => (
-                            <button
-                              key={`sel_${idx}_${word}`}
-                              onClick={() => handleWordDeselect(word, idx)}
-                              className={`px-2.5 py-1 rounded-lg text-white text-xs font-semibold shadow transition-all active:scale-95 ${actionBtnClass}`}
-                            >
-                              {word}
-                            </button>
-                          ))
+                      <div className="space-y-1.5">
+                        <div
+                          className={`min-h-12 p-2.5 rounded-xl border border-dashed flex flex-wrap gap-1.5 items-center transition-all ${
+                            hasError
+                              ? 'border-rose-500 bg-rose-950/20'
+                              : 'border-slate-700 bg-slate-950/60'
+                          }`}
+                        >
+                          {selectedWords.length === 0 ? (
+                            <span className="text-xs text-slate-500 italic">
+                              Доорх үгсээс дарж сонгоно уу...
+                            </span>
+                          ) : (
+                            selectedWords.map((word, idx) => (
+                              <button
+                                key={`sel_${idx}_${word}`}
+                                draggable
+                                data-selected-word-idx={idx}
+                                onDragStart={(e) => handleDragStartWord(idx, e)}
+                                onDragOver={(e) => handleDragOverWord(idx, e)}
+                                onDrop={(e) => handleDropWord(idx, e)}
+                                onDragEnd={() => {
+                                  setDraggedWordIdx(null);
+                                  setDragOverWordIdx(null);
+                                }}
+                                onTouchStart={(e) => handleTouchStartWord(idx, e)}
+                                onTouchMove={handleTouchMoveWord}
+                                onTouchEnd={() => handleTouchEndWord(idx, word)}
+                                onClick={() => {
+                                  if (Date.now() - lastTouchTime.current < 400) return;
+                                  handleWordDeselect(word, idx);
+                                }}
+                                className={`px-2.5 py-1.5 rounded-lg text-white text-xs font-semibold shadow select-none cursor-grab active:cursor-grabbing transition-all duration-150 ${actionBtnClass} ${
+                                  dragOverWordIdx === idx && draggedWordIdx !== idx
+                                    ? 'ring-2 ring-amber-300 scale-105 shadow-amber-500/50'
+                                    : ''
+                                } ${draggedWordIdx === idx ? 'opacity-40 scale-95' : 'opacity-100'}`}
+                              >
+                                <span className="flex items-center gap-1">
+                                  <span className="text-[10px] opacity-60">⋮⋮</span>
+                                  {word}
+                                </span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+
+                        {selectedWords.length > 1 && (
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium px-1">
+                            <span className="text-amber-400 font-bold">⇄</span>
+                            <span>Үгсийг чирч (drag) байрыг нь сольж болно</span>
+                          </div>
                         )}
                       </div>
 

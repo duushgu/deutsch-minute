@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deutsch-minute-v10';
+const CACHE_NAME = 'deutsch-minute-v11';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

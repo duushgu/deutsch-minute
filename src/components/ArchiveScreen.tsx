@@ -4,6 +4,7 @@ import { DayLesson, ProfileConfig, SiblingProgress } from '../types';
 import { CURRICULUM } from '../data/curriculum';
 import { audioPlayer } from '../services/audioPlayer';
 import { formatDialogueText } from '../services/storage';
+import { ActivityHeatmap } from './ActivityHeatmap';
 
 interface ArchiveScreenProps {
   config: ProfileConfig;
@@ -101,6 +102,9 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
           Өмнө нь сурсан бүх яриагаа хүссэн үедээ дахин сонсож, давтаж болно. 🎧
         </p>
       </div>
+
+      {/* 60-Day Habit & Activity Heatmap */}
+      <ActivityHeatmap progress={progress} theme={config.theme} />
 
       {/* Lesson List */}
       <div className="space-y-2.5">
