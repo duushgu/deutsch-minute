@@ -3,9 +3,7 @@ import {
   Flame,
   Sparkles,
   Trophy,
-  Heart,
   Zap,
-  ShieldCheck,
   Star,
   Settings,
   Edit2,
@@ -14,7 +12,8 @@ import {
 } from 'lucide-react';
 import { ProfileConfig, ProfileId, SiblingProgress, SquadState, ThemeId } from '../types';
 import { ActivityHeatmap } from './ActivityHeatmap';
-import { getSisterMemory, getIstpRank, getIsfjHeroRank } from '../services/gamification';
+import { QuickTranslator } from './QuickTranslator';
+import { getIstpRank } from '../services/gamification';
 import { updateCustomName, saveSquadState } from '../services/storage';
 import { soundFX } from '../services/soundEffects';
 
@@ -69,12 +68,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const userName = progress.name || config.name;
   const partnerName = progress.partnerName || config.partnerName;
   const completedCount = progress.completedDays?.length || 0;
-  const currentDay = progress.currentDay || 1;
 
   // Gamification data by profile
-  const sisterMemory = getSisterMemory(currentDay, partnerName, userName);
   const istpRank = getIstpRank(completedCount, progress.xp || 0);
-  const isfjHeroRank = getIsfjHeroRank(completedCount, partnerName);
 
   const availableThemes = PROFILE_THEMES[activeId] || [];
 
@@ -207,37 +203,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       {/* ============================================================ */}
       <ActivityHeatmap progress={progress} theme={config.theme} />
 
-      {/* ============================================================ */}
-      {/* PERSONALIZED GAMIFICATION CARD FOR PROFILE                  */}
-      {/* ============================================================ */}
-
-      {/* 1. SISTER (INFJ) - K-Drama Aesthetic Daily Polaroid Memory Card */}
-      {config.id === 'sister' && (
-        <div className="bg-gradient-to-br from-pink-950/40 via-purple-950/30 to-slate-900 border border-pink-500/30 rounded-3xl p-4 shadow-xl relative overflow-hidden">
-          <div className="flex items-center justify-between mb-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-pink-300 uppercase tracking-wider">
-              <Heart className="w-4 h-4 text-pink-400 fill-pink-400/50" />
-              {sisterMemory.tag}
-            </div>
-            <span className="text-[11px] text-pink-300/80 font-mono">
-              📖 {completedCount}/10 дурсамж
-            </span>
-          </div>
-
-          <div className="bg-slate-950/80 border border-pink-500/20 rounded-2xl p-3.5 text-center shadow-lg">
-            <div className="text-xs font-bold text-pink-200 mb-1">
-              {partnerName} & {userName}
-            </div>
-            <p className="text-xs text-slate-300 italic px-2 py-1 leading-relaxed">
-              "{sisterMemory.quoteMn}"
-            </p>
-            <div className="mt-2 pt-2 border-t border-pink-900/40 text-[11px] text-pink-300 font-mono">
-              🇩🇪 {sisterMemory.quoteDe}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 2. BROTHER 1 (ISTP) - Mobile Legends Combat HUD & Rank Badge */}
       {config.id === 'brother1' && (
         <div className="bg-gradient-to-br from-cyan-950/60 via-slate-900 to-emerald-950/40 border border-cyan-500/40 rounded-3xl p-4 shadow-xl relative overflow-hidden">
@@ -281,39 +246,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
       )}
 
-      {/* 3. BROTHER 2 (ISFJ) - Anime Buddy Bond & Hero Shield Card */}
-      {config.id === 'brother2' && (
-        <div className="bg-gradient-to-br from-emerald-950/60 via-slate-900 to-amber-950/40 border border-emerald-500/40 rounded-3xl p-4 shadow-xl relative overflow-hidden">
-          <div className="flex items-center justify-between mb-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-300 uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              Багийн нөхөрлөл & Баатрын цол
-            </div>
-            <span className="text-[10px] text-emerald-300 font-mono font-bold bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800">
-              {isfjHeroRank.rankBadge} {isfjHeroRank.rankTitle.split('•')[0]}
-            </span>
-          </div>
-
-          <div className="bg-slate-950/80 border border-emerald-500/30 rounded-2xl p-3.5 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-white">Нөхөрлөлийн холбоо</span>
-              <span className="text-xs font-mono font-bold text-emerald-400">
-                {isfjHeroRank.buddyBondPercent}%
-              </span>
-            </div>
-            <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-emerald-900/50">
-              <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-amber-400 rounded-full transition-all duration-500"
-                style={{ width: `${isfjHeroRank.buddyBondPercent}%` }}
-              />
-            </div>
-            <div className="p-2 rounded-xl bg-emerald-950/60 border border-emerald-800/60 text-xs text-emerald-200 italic flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>"{isfjHeroRank.heroQuote}"</span>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* QUICK TRANSLATOR & GERMAN WRITING TOOL */}
+      <QuickTranslator profileId={config.id} theme={config.theme} />
 
       {/* Theme Selection in Profile */}
       <div className="p-4 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-md space-y-2.5">
