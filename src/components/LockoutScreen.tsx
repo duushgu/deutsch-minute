@@ -7,6 +7,8 @@ interface LockoutScreenProps {
   lesson: DayLesson;
   config: ProfileConfig;
   progress: SiblingProgress;
+  partnerName: string;
+  partnerAvatar: string;
   onNavigateToSquad: () => void;
   onNavigateToArchive: () => void;
 }
@@ -15,6 +17,8 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
   lesson,
   config,
   progress,
+  partnerName,
+  partnerAvatar: _partnerAvatar,
   onNavigateToSquad,
   onNavigateToArchive,
 }) => {
@@ -117,16 +121,22 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
             >
               <div>
                 <div className="text-[11px] font-bold text-indigo-300 mb-0.5">
-                  {turn.speaker === 'partner' ? config.partnerName : (progress.name || config.name)}
+                  {turn.speaker === 'partner' ? partnerName : (progress.name || config.name)}
                 </div>
                 <div className="text-sm font-semibold text-white">
-                  {turn.textDe.replace(new RegExp(config.name, 'g'), progress.name || config.name)}
+                  {turn.textDe
+                    .replace(new RegExp(config.name, 'g'), progress.name || config.name)
+                    .replace(new RegExp(config.partnerName, 'g'), partnerName)}
                 </div>
                 <div className="text-[11px] font-mono text-indigo-400">
-                  {turn.phoneticMn.replace(new RegExp(config.name, 'g'), progress.name || config.name)}
+                  {turn.phoneticMn
+                    .replace(new RegExp(config.name, 'g'), progress.name || config.name)
+                    .replace(new RegExp(config.partnerName, 'g'), partnerName)}
                 </div>
                 <div className="text-[10px] text-slate-400 mt-0.5">
-                  {turn.textMn.replace(new RegExp(config.name, 'g'), progress.name || config.name)}
+                  {turn.textMn
+                    .replace(new RegExp(config.name, 'g'), progress.name || config.name)
+                    .replace(new RegExp(config.partnerName, 'g'), partnerName)}
                 </div>
               </div>
 

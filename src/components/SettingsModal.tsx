@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { X, Volume2, VolumeX, Shield, RefreshCw, Cloud, Edit2, Check } from 'lucide-react';
+import { X, Volume2, VolumeX, Shield, RefreshCw, Edit2, Check } from 'lucide-react';
 import { ProfileId, SquadState } from '../types';
 import { PROFILES } from '../data/profiles';
+import { FRIENDS_BY_PROFILE, FriendCharacter } from '../data/friends';
 import { soundFX } from '../services/soundEffects';
-import { updateCustomName } from '../services/storage';
+import { updateCustomName, saveSquadState } from '../services/storage';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -21,8 +22,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const activeId = squadState.activeProfileId;
   const config = PROFILES[activeId];
   const progress = squadState.profiles[activeId];
+  const friendsList = FRIENDS_BY_PROFILE[activeId] || [];
 
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
+  const [isChoosingFriend, setIsChoosingFriend] = useState<boolean>(false);
   const [nameInput, setNameInput] = useState<string>(progress.name || config.name);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(soundFX.enabled);
   const [message, setMessage] = useState<string | null>(null);
@@ -39,7 +42,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     const updated = updateCustomName(squadState, activeId, nameInput.trim());
     onUpdateSquadState(updated);
     setIsEditingName(false);
-    setMessage('Name erfolgreich geändert! ✅');
+    setMessage('Нэр амжилттай хадгалагдлаа! ✅');
+    setTimeout(() => setMessage(null), 2500);
+  };
+
+  const handleSelectPartner = (friend: FriendCharacter) => {
+    soundFX.playTap();
+    const updated: SquadState = {
+      ...squadState,
+      profiles: {
+        ...squadState.profiles,
+        [activeId]: {
+          ...progress,
+          partnerName: friend.name,
+          partnerAvatar: friend.avatar,
+        },
+      },
+    };
+    saveSquadState(updated);
+    onUpdateSquadState(updated);
+    setIsChoosingFriend(false);
+    setMessage(`${friend.name} таны хамтрагч боллоо! 🌟`);
     setTimeout(() => setMessage(null), 2500);
   };
 
@@ -71,19 +94,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       },
     };
     onUpdateSquadState(updated);
-    setMessage('Heutige Mission für ' + (progress.name || config.name) + ' zurückgesetzt!');
+    setMessage('Өнөөдрийн даалгаврыг дахин эхлүүлэхээр боллоо!');
     setTimeout(() => setMessage(null), 2500);
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full max-h-[90vh] overflow-y-auto p-5 shadow-2xl space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-indigo-400" />
             <h3 className="text-base font-black text-white">
-              Einstellungen
+              Тохиргоо (Einstellungen)
             </h3>
           </div>
           <button
@@ -107,13 +130,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <span className="text-2xl">{config.userAvatar}</span>
               <div>
                 <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                  {progress.name || config.name}
-                  <span className="text-[10px] px-1.5 py-0.2 bg-indigo-950 text-indigo-300 rounded font-mono border border-indigo-800/50">
-                    {config.mbti}
-                  </span>
+                  <span>{progress.name || config.name}</span>
+                  <span className="text-xs">{progress.partnerAvatar || config.partnerAvatar}</span>
                 </div>
                 <div className="text-[10px] text-slate-400">
-                  {config.title}
+                  Хамтрагч: {progress.partnerName || config.partnerName}
                 </div>
               </div>
             </div>
@@ -121,7 +142,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <button
               onClick={() => setIsEditingName(!isEditingName)}
               className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700"
-              title="Name anpassen"
+              title="Нэр өөрчлөх"
             >
               <Edit2 className="w-3.5 h-3.5" />
             </button>
@@ -131,7 +152,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {isEditingName && (
             <div className="mt-3 pt-3 border-t border-slate-800 space-y-2">
               <label className="text-[11px] font-semibold text-slate-300 block">
-                Dein Name / Spitzname:
+                Өөрийн нэр / хоч:
               </label>
               <div className="flex gap-2">
                 <input
@@ -146,18 +167,89 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center gap-1"
                 >
                   <Check className="w-3.5 h-3.5" />
-                  Speichern
+                  Хадгалах
                 </button>
               </div>
             </div>
           )}
         </div>
 
+        {/* Change Partner Button */}
+        <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{progress.partnerAvatar || config.partnerAvatar}</span>
+              <div>
+                <div className="text-xs font-bold text-white">
+                  Хамтрагч: {progress.partnerName || config.partnerName}
+                </div>
+                <div className="text-[10px] text-slate-400">
+                  Германаар ярилцах найз
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsChoosingFriend(!isChoosingFriend)}
+              className="px-2.5 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-200 border border-indigo-500/50 text-[11px] font-bold"
+            >
+              Солих
+            </button>
+          </div>
+
+          {/* Partner Grid in Settings */}
+          {isChoosingFriend && (
+            <div className="mt-3 pt-3 border-t border-slate-800 grid grid-cols-2 gap-1.5 max-h-44 overflow-y-auto pr-1">
+              {friendsList.map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => handleSelectPartner(f)}
+                  className={`p-2 rounded-xl border text-left flex items-center gap-2 text-xs transition-all active:scale-95 ${
+                    progress.partnerName === f.name
+                      ? 'bg-indigo-600/40 border-indigo-400 text-white font-bold'
+                      : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+                  }`}
+                >
+                  <span className="text-lg">{f.avatar}</span>
+                  <div className="truncate">
+                    <div className="font-bold truncate">{f.name}</div>
+                    <div className="text-[9px] text-slate-400 truncate">{f.role}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Audio / SFX Toggle */}
+        <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+          <div>
+            <div className="text-xs font-bold text-white">Дууны эффект</div>
+            <div className="text-[10px] text-slate-400">
+              Товчлуур дарах, зөв хариулах чимээ
+            </div>
+          </div>
+          <button
+            onClick={handleToggleSound}
+            className={`p-2 rounded-xl border transition-all ${
+              soundEnabled
+                ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50'
+                : 'bg-slate-800 text-slate-500 border-slate-700'
+            }`}
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-4 h-4" />
+            ) : (
+              <VolumeX className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+
         {/* Profile Switcher (Only shown if NOT dedicated device) */}
         {!squadState.dedicatedProfileId && (
-          <div>
+          <div className="pt-2 border-t border-slate-800">
             <label className="text-xs font-bold text-slate-300 block mb-2">
-              Profil wechseln (Gemeinsamer Test-Modus):
+              Профайл солих (Туршилтын горим):
             </label>
             <div className="grid grid-cols-3 gap-2">
               {(['sister', 'brother1', 'brother2'] as ProfileId[]).map((id) => {
@@ -178,9 +270,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <div className="text-[11px] font-bold text-white truncate">
                       {p.name || prof.name}
                     </div>
-                    <div className="text-[9px] text-slate-400 font-mono">
-                      {prof.mbti}
-                    </div>
                   </button>
                 );
               })}
@@ -188,59 +277,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         )}
 
-        {/* Silent Cloud-Sync Card */}
-        <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-950/60 border border-emerald-800 flex items-center justify-center text-emerald-400">
-              <Cloud className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                Automatischer Cloud-Sync
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              </div>
-              <div className="text-[10px] text-slate-400">
-                Fortschritt wird lautlos im Hintergrund gesichert
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Audio / SFX Toggle */}
-        <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-          <div>
-            <div className="text-xs font-bold text-white">Soundeffekte</div>
-            <div className="text-[10px] text-slate-400">
-              Töne beim Tippen und Lösen
-            </div>
-          </div>
-          <button
-            onClick={handleToggleSound}
-            className={`p-2 rounded-xl border transition-all ${
-              soundEnabled
-                ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50'
-                : 'bg-slate-800 text-slate-500 border-slate-700'
-            }`}
-          >
-            {soundEnabled ? (
-              <Volume2 className="w-4 h-4" />
-            ) : (
-              <VolumeX className="w-4 h-4" />
-            )}
-          </button>
-        </div>
-
         {/* Admin Tools for Big Brother */}
         <div className="pt-2 border-t border-slate-800 space-y-2">
           <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Admin-Optionen (Für den großen Bruder)
+            Том ахын тохиргоо (Admin)
           </div>
 
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
             <div>
               <div className="text-xs font-semibold text-slate-200">
-                ⚡ Schnelltest (24h-Sperre aus)
+                ⚡ 24 цагийн түгжээг унтраах
               </div>
             </div>
             <button
@@ -251,7 +298,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   : 'bg-slate-800 text-slate-400 border-slate-700'
               }`}
             >
-              {squadState.testModeUnlocked ? 'AKTIV' : 'AUS'}
+              {squadState.testModeUnlocked ? 'ИДЭВХТЭЙ' : 'УНТРААЛТТАЙ'}
             </button>
           </div>
 
@@ -260,7 +307,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             className="w-full py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-[11px] font-semibold text-slate-300 border border-slate-700 flex items-center justify-center gap-1.5 transition-all"
           >
             <RefreshCw className="w-3 h-3" />
-            Heutigen Tag zurücksetzen
+            Өнөөдрийн даалгаврыг дахин эхлүүлэх
           </button>
         </div>
       </div>

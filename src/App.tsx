@@ -12,7 +12,7 @@ import {
   loadSquadState,
   completeDayLesson,
   isCompletedToday,
-  updateCustomName,
+  updateOnboarding,
 } from './services/storage';
 import { ProfileId, SquadState } from './types';
 
@@ -34,11 +34,13 @@ export const App: React.FC = () => {
 
   const isTodayDone = isCompletedToday(progress, squadState.testModeUnlocked);
   const displayName = progress.name || config.name;
+  const partnerName = progress.partnerName || config.partnerName;
+  const partnerAvatar = progress.partnerAvatar || config.partnerAvatar;
 
   // Dynamically set title for Android PWA "Add to Home Screen"
   useEffect(() => {
-    document.title = `${displayName} ${config.userAvatar} Deutsch Minute`;
-  }, [displayName, config.userAvatar]);
+    document.title = `${displayName} ${partnerAvatar} Герман хэл`;
+  }, [displayName, partnerAvatar]);
 
   const handleCompleteLesson = (day: number) => {
     const updated = completeDayLesson(squadState, activeProfile, day);
@@ -52,8 +54,18 @@ export const App: React.FC = () => {
     }));
   };
 
-  const handleSaveOnboardingName = (newName: string) => {
-    const updated = updateCustomName(squadState, activeProfile, newName);
+  const handleCompleteOnboarding = (
+    customName: string,
+    chosenPartnerName: string,
+    chosenPartnerAvatar: string
+  ) => {
+    const updated = updateOnboarding(
+      squadState,
+      activeProfile,
+      customName,
+      chosenPartnerName,
+      chosenPartnerAvatar
+    );
     setSquadState(updated);
   };
 
@@ -81,6 +93,8 @@ export const App: React.FC = () => {
                 lesson={currentLesson}
                 config={config}
                 progress={progress}
+                partnerName={partnerName}
+                partnerAvatar={partnerAvatar}
                 onNavigateToSquad={() => setActiveTab('squad')}
                 onNavigateToArchive={() => setActiveTab('archive')}
               />
@@ -89,6 +103,8 @@ export const App: React.FC = () => {
                 lesson={currentLesson}
                 config={config}
                 userName={displayName}
+                partnerName={partnerName}
+                partnerAvatar={partnerAvatar}
                 onComplete={handleCompleteLesson}
               />
             )}
@@ -107,12 +123,13 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* First-Time Name Onboarding Modal */}
+      {/* First-Time Name & Hero Selection Onboarding Modal */}
       {!progress.hasCompletedOnboarding && (
         <OnboardingModal
           config={config}
-          currentName={displayName}
-          onSaveName={handleSaveOnboardingName}
+          defaultPartnerName={config.partnerName}
+          defaultPartnerAvatar={config.partnerAvatar}
+          onComplete={handleCompleteOnboarding}
         />
       )}
 

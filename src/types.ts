@@ -1,12 +1,9 @@
-export type MBTIType = 'INFJ' | 'ISTP' | 'ISFJ';
-
 export type ProfileId = 'sister' | 'brother1' | 'brother2';
 
 export interface ProfileConfig {
   id: ProfileId;
   name: string;
   age: number;
-  mbti: MBTIType;
   title: string;
   theme: 'kdrama' | 'gamer' | 'cozy';
   partnerName: string;
@@ -29,10 +26,8 @@ export interface DialogueChallenge {
   type: 'word_order' | 'choice';
   promptDe?: string;
   promptMn?: string;
-  // For word order
   scrambledWords?: string[];
   correctOrder?: string[];
-  // For choice selection
   choices?: ChoiceOption[];
 }
 
@@ -65,7 +60,8 @@ export interface DayLesson {
 export interface SiblingProgress {
   profileId: ProfileId;
   name: string; // User-customized display name
-  mbti: MBTIType;
+  partnerName: string; // Chosen hero/friend name
+  partnerAvatar: string; // Chosen hero avatar
   currentDay: number;
   completedDays: number[];
   streak: number;
@@ -80,7 +76,7 @@ export interface SquadState {
   version: number;
   profiles: Record<ProfileId, SiblingProgress>;
   activeProfileId: ProfileId;
-  dedicatedProfileId: ProfileId | null; // locked if opened via personalized link
+  dedicatedProfileId: ProfileId | null; // locked if opened via dedicated app
   testModeUnlocked: boolean; // admin toggle for testing
   cloudSyncUrl?: string;
   lastSyncTimestamp?: number;

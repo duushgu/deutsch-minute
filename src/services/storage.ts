@@ -1,8 +1,8 @@
 import { ProfileId, SiblingProgress, SquadState } from '../types';
 import { PROFILES } from '../data/profiles';
 
-const STORAGE_KEY = 'deutsch_minute_squad_v2';
-const DEDICATED_KEY = 'deutsch_minute_dedicated_profile';
+const STORAGE_KEY = 'deutsch_minute_squad_v3';
+const DEDICATED_KEY = 'deutsch_minute_dedicated_profile_v3';
 
 export function getTodayDateString(): string {
   const now = new Date();
@@ -15,18 +15,23 @@ export function getTodayDateString(): string {
 export function detectUrlProfile(): ProfileId | null {
   if (typeof window === 'undefined') return null;
 
-  // Check query param: ?p=anu, ?p=temuulen, ?p=batu
+  const preset = (window as unknown as { __PRESET_PROFILE__?: ProfileId }).__PRESET_PROFILE__;
+  if (preset) return preset;
+
+  const path = window.location.pathname.toLowerCase();
+  if (path.includes('mongonchimeg')) return 'sister';
+  if (path.includes('tomoo')) return 'brother1';
+  if (path.includes('jijgee')) return 'brother2';
+
+  // Check query param: ?p=mongonchimeg, ?p=tomoo, ?p=jijgee, or ?p=anu etc.
   const params = new URLSearchParams(window.location.search);
   const pParam = params.get('p')?.toLowerCase();
-
-  // Check hash: #anu, #temuulen, #batu
   const hash = window.location.hash.replace('#', '').toLowerCase();
-
   const target = pParam || hash;
 
-  if (target === 'anu' || target === 'sister') return 'sister';
-  if (target === 'temuulen' || target === 'temu' || target === 'brother1') return 'brother1';
-  if (target === 'batu' || target === 'brother2') return 'brother2';
+  if (target === 'mongonchimeg' || target === 'chimeg' || target === 'anu' || target === 'sister') return 'sister';
+  if (target === 'tomoo' || target === 'temuulen' || target === 'temu' || target === 'brother1') return 'brother1';
+  if (target === 'jijgee' || target === 'batu' || target === 'brother2') return 'brother2';
 
   return null;
 }
@@ -36,7 +41,8 @@ function createDefaultSiblingProgress(id: ProfileId): SiblingProgress {
   return {
     profileId: id,
     name: config.name,
-    mbti: config.mbti,
+    partnerName: config.partnerName,
+    partnerAvatar: config.partnerAvatar,
     currentDay: 1,
     completedDays: [],
     streak: 0,
@@ -51,7 +57,7 @@ function createDefaultSiblingProgress(id: ProfileId): SiblingProgress {
 export function getDefaultSquadState(dedicatedId: ProfileId | null = null): SquadState {
   const active = dedicatedId || 'brother1';
   return {
-    version: 2,
+    version: 3,
     activeProfileId: active,
     dedicatedProfileId: dedicatedId,
     testModeUnlocked: false,
@@ -82,7 +88,6 @@ export function loadSquadState(): SquadState {
 
     const parsed = JSON.parse(raw) as SquadState;
 
-    // Ensure all profiles exist
     (['sister', 'brother1', 'brother2'] as ProfileId[]).forEach((id) => {
       if (!parsed.profiles[id]) {
         parsed.profiles[id] = createDefaultSiblingProgress(id);
@@ -103,11 +108,36 @@ export function loadSquadState(): SquadState {
 export function saveSquadState(state: SquadState): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    // Trigger silent cloud sync in background if online
+    // Silent background sync
     silentCloudSync(state).catch(() => {});
   } catch (err) {
     console.error('Error saving squad state:', err);
   }
+}
+
+export function updateOnboarding(
+  state: SquadState,
+  profileId: ProfileId,
+  customName: string,
+  partnerName: string,
+  partnerAvatar: string
+): SquadState {
+  const profile = state.profiles[profileId];
+  const updated: SquadState = {
+    ...state,
+    profiles: {
+      ...state.profiles,
+      [profileId]: {
+        ...profile,
+        name: customName.trim() || profile.name,
+        partnerName: partnerName || profile.partnerName,
+        partnerAvatar: partnerAvatar || profile.partnerAvatar,
+        hasCompletedOnboarding: true,
+      },
+    },
+  };
+  saveSquadState(updated);
+  return updated;
 }
 
 export function updateCustomName(state: SquadState, profileId: ProfileId, newName: string): SquadState {
@@ -185,26 +215,35 @@ export function completeDayLesson(state: SquadState, profileId: ProfileId, day: 
   return updatedState;
 }
 
-// Silent cloud sync function:
-// Sends payload to cloud endpoint if configured, or fails gracefully without bothering user
+// Background silent sync
 export async function silentCloudSync(state: SquadState): Promise<boolean> {
-  if (!state.cloudSyncUrl) return false;
+  const syncEndpoints = [
+    state.cloudSyncUrl,
+    'http://192.168.1.169:8767/api/sync', // Local ultra2 sync daemon fallback
+  ].filter(Boolean) as string[];
 
-  try {
-    const active = state.activeProfileId;
-    const progress = state.profiles[active];
+  if (syncEndpoints.length === 0) return false;
 
-    await fetch(state.cloudSyncUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        profileId: active,
-        progress,
-        timestamp: Date.now(),
-      }),
-    });
-    return true;
-  } catch {
-    return false;
+  const active = state.activeProfileId;
+  const payload = {
+    profileId: active,
+    progress: state.profiles[active],
+    allProfiles: state.profiles,
+    timestamp: Date.now(),
+  };
+
+  for (const endpoint of syncEndpoints) {
+    try {
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (resp.ok) return true;
+    } catch {
+      // Ignore network errors silently
+    }
   }
+
+  return false;
 }

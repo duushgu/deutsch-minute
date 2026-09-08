@@ -1,0 +1,22 @@
+{
+  "name": "Томоо ⚡ Герман хэл",
+  "short_name": "Томоо",
+  "description": "Томоогийн өдөр тутмын 1 минутын Герман хэл",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#091b29",
+  "theme_color": "#06b6d4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "../icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "../icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

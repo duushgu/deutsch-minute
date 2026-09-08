@@ -9,6 +9,8 @@ interface ChatSessionProps {
   lesson: DayLesson;
   config: ProfileConfig;
   userName: string;
+  partnerName: string;
+  partnerAvatar: string;
   onComplete: (day: number) => void;
 }
 
@@ -16,6 +18,8 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   lesson,
   config,
   userName,
+  partnerName,
+  partnerAvatar,
   onComplete,
 }) => {
   // Stage in the 1-minute flow:
@@ -36,7 +40,9 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
 
   const formatText = (text: string) => {
     if (!text) return text;
-    return text.replace(new RegExp(config.name, 'g'), userName);
+    return text
+      .replace(new RegExp(config.name, 'g'), userName)
+      .replace(new RegExp(config.partnerName, 'g'), partnerName);
   };
 
   // Timer: counts up to 60 seconds
@@ -51,12 +57,12 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   useEffect(() => {
     if (turn2?.challenge?.type === 'word_order' && turn2.challenge.scrambledWords) {
       const formattedWords = turn2.challenge.scrambledWords.map((w) =>
-        w.replace(config.name, userName)
+        w.replace(config.name, userName).replace(config.partnerName, partnerName)
       );
       setAvailableWords([...formattedWords]);
       setSelectedWords([]);
     }
-  }, [turn2, userName, config.name]);
+  }, [turn2, userName, partnerName, config.name, config.partnerName]);
 
   // Autoplay partner message on first load
   useEffect(() => {
@@ -89,7 +95,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
 
   const handleCheckWordOrder = () => {
     const targetOrder = (turn2.challenge?.correctOrder || []).map((w) =>
-      w.replace(config.name, userName)
+      w.replace(config.name, userName).replace(config.partnerName, partnerName)
     );
     const isMatch =
       selectedWords.length === targetOrder.length &&
@@ -166,12 +172,12 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         {/* Turn 1: Partner Bubble */}
         <div className="flex items-start gap-2.5">
           <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow shrink-0">
-            {config.partnerAvatar}
+            {partnerAvatar}
           </div>
           <div className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3.5 shadow-md">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-bold text-slate-300">
-                {config.partnerName}
+                {partnerName}
               </span>
               <button
                 onClick={() => playAudio(turn1.audioKey, turn1.textDe)}
@@ -335,12 +341,12 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         {currentStep >= 3 && (
           <div className="flex items-start gap-2.5 animate-fadeIn">
             <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow shrink-0">
-              {config.partnerAvatar}
+              {partnerAvatar}
             </div>
             <div className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3.5 shadow-md">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-bold text-slate-300">
-                  {config.partnerName}
+                  {partnerName}
                 </span>
                 <button
                   onClick={() => playAudio(turn3.audioKey, turn3.textDe)}
