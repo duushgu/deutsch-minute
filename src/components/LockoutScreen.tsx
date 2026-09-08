@@ -59,48 +59,66 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
   const istpRank = getIstpRank(completedCount, progress.xp || 0);
   const isfjHeroRank = getIsfjHeroRank(completedCount, partnerName);
 
+  const isKdrama = config.theme === 'kdrama';
+  const isGamer = config.theme === 'gamer';
+
+  const lockoutHeaderClass = isKdrama
+    ? 'bg-gradient-to-b from-[#1c0d2e]/90 to-[#2f1345]/70 border-pink-500/40 shadow-pink-950/30'
+    : isGamer
+    ? 'bg-gradient-to-b from-[#051329]/90 to-[#022a45]/70 border-cyan-500/40 shadow-cyan-950/30'
+    : 'bg-gradient-to-b from-[#04241b]/90 to-[#033b28]/70 border-emerald-500/40 shadow-emerald-950/30';
+
+  const cardBaseClass = isKdrama
+    ? 'bg-[#150924]/80 border-pink-900/40 shadow-pink-950/20'
+    : isGamer
+    ? 'bg-[#030e1f]/80 border-cyan-900/40 shadow-cyan-950/20'
+    : 'bg-[#021812]/80 border-emerald-900/40 shadow-emerald-950/20';
+
+  const rowBaseClass = isKdrama
+    ? 'bg-[#220d36]/70 border-pink-950/60'
+    : isGamer
+    ? 'bg-[#061830]/70 border-cyan-950/60'
+    : 'bg-[#04291f]/70 border-emerald-950/60';
+
   return (
     <div className="max-w-md mx-auto p-4 pb-24 space-y-4">
       {/* Lockout Header Card */}
-      <div className="bg-gradient-to-b from-slate-900 to-indigo-950/60 border border-indigo-500/30 rounded-3xl p-5 text-center shadow-xl relative overflow-hidden">
-        <div className="absolute -right-8 -top-8 w-28 h-28 bg-indigo-500/10 rounded-full blur-2xl" />
-        <div className="absolute -left-8 -bottom-8 w-28 h-28 bg-purple-500/10 rounded-full blur-2xl" />
-
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 text-2xl mb-3 shadow-inner">
+      <div className={`border rounded-3xl p-5 text-center shadow-xl relative overflow-hidden backdrop-blur-md transition-all ${lockoutHeaderClass}`}>
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/10 border border-white/20 text-2xl mb-3 shadow-inner">
           🌟
         </div>
 
         <h2 className="text-xl font-black text-white tracking-wide">
           Өнөөдрийн 1 минут дууслаа! 🌟
         </h2>
-        <p className="text-xs text-indigo-300 font-medium mt-1">
+        <p className="text-xs text-slate-200 font-medium mt-1">
           Гайхалтай! Маргааш дараагийн даалгавар нээгдэнэ.
         </p>
 
         {/* Streak & XP Stats */}
         <div className="flex justify-center gap-3 mt-3.5">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700">
-            <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 border border-white/10">
+            <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
             <span className="text-xs font-bold text-amber-300 font-mono">
               {progress.streak} өдөр дараалан
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="text-xs font-bold text-indigo-300 font-mono">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 border border-white/10">
+            <Sparkles className="w-4 h-4 text-white" />
+            <span className="text-xs font-bold text-white font-mono">
               {progress.xp} XP
             </span>
           </div>
         </div>
 
         {/* 24-Hour Countdown Timer */}
-        <div className="mt-5 pt-4 border-t border-indigo-900/40">
-          <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mb-1 flex items-center justify-center gap-1">
-            <Clock className="w-3.5 h-3.5 text-indigo-400" />
+        <div className="mt-5 pt-4 border-t border-white/10">
+          <div className="text-[11px] uppercase tracking-wider text-slate-300 font-semibold mb-1 flex items-center justify-center gap-1">
+            <Clock className="w-3.5 h-3.5 text-slate-200" />
             Дараагийн даалгавар нээгдэх хугацаа:
           </div>
-          <div className="text-2xl font-black font-mono text-indigo-200 tracking-wider">
+          <div className="text-2xl font-black font-mono text-white tracking-wider">
             {String(timeLeft.hours).padStart(2, '0')}:
             {String(timeLeft.minutes).padStart(2, '0')}:
             {String(timeLeft.seconds).padStart(2, '0')}
@@ -267,36 +285,36 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
       )}
 
       {/* Recap: Dialog of the day */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-md">
+      <div className={`border rounded-2xl p-4 shadow-md backdrop-blur-md transition-all ${cardBaseClass}`}>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             {lesson.day}-р өдөр • Яриаг давтах
           </h3>
-          <span className="text-[10px] text-slate-500">Сонсох 🔊</span>
+          <span className="text-[10px] text-slate-400">Сонсох 🔊</span>
         </div>
 
         <div className="space-y-2.5">
           {lesson.dialogue.map((turn) => (
             <div
               key={turn.id}
-              className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-start justify-between gap-2"
+              className={`p-2.5 rounded-xl border flex items-start justify-between gap-2 backdrop-blur-sm ${rowBaseClass}`}
             >
               <div>
-                <div className="text-[11px] font-bold text-indigo-300 mb-0.5">
+                <div className="text-[11px] font-bold text-slate-300 mb-0.5">
                   {turn.speaker === 'partner' ? partnerName : userName}
                 </div>
                 <div className="text-sm font-semibold text-white">
                   {formatDialogueText(turn.textDe, config.name, userName, config.partnerName, partnerName)}
                 </div>
-                <div className="text-[10px] text-slate-400 mt-0.5">
+                <div className="text-[10px] text-slate-300/80 mt-0.5">
                   {formatDialogueText(turn.textMn, config.name, userName, config.partnerName, partnerName)}
                 </div>
               </div>
 
               <button
                 onClick={() => playAudio(turn.audioKey, turn.textDe)}
-                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 shrink-0 transition-all active:scale-95"
+                className="p-2 rounded-xl bg-black/40 hover:bg-black/60 text-slate-200 border border-white/10 shrink-0 transition-all active:scale-95"
                 title="Сонсох"
               >
                 <Volume2 className="w-4 h-4" />
@@ -307,8 +325,8 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
       </div>
 
       {/* Key Vocabulary of the Day */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-md">
-        <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+      <div className={`border rounded-2xl p-4 shadow-md backdrop-blur-md transition-all ${cardBaseClass}`}>
+        <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
           <BookOpen className="w-4 h-4 text-amber-400" />
           Өнөөдрийн чухал үгс (3 үг)
         </h3>
@@ -316,12 +334,12 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
           {lesson.keyVocab.map((vocab, i) => (
             <div
               key={i}
-              className="p-2.5 rounded-xl bg-slate-950/50 border border-slate-800 flex items-center justify-between"
+              className={`p-2.5 rounded-xl border flex items-center justify-between backdrop-blur-sm ${rowBaseClass}`}
             >
               <span className="text-xs font-bold text-amber-300 mr-2">
                 {formatDialogueText(vocab.de, config.name, userName, config.partnerName, partnerName)}
               </span>
-              <span className="text-xs text-slate-300">
+              <span className="text-xs text-slate-200">
                 {formatDialogueText(vocab.mn, config.name, userName, config.partnerName, partnerName)}
               </span>
             </div>

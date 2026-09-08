@@ -19,16 +19,37 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSettings,
   testModeUnlocked,
 }) => {
+  const headerBgClass =
+    config.theme === 'kdrama'
+      ? 'bg-[#13081e]/80 border-pink-900/40 shadow-lg shadow-pink-950/20'
+      : config.theme === 'gamer'
+      ? 'bg-[#030914]/85 border-cyan-900/40 shadow-lg shadow-cyan-950/20'
+      : 'bg-[#021610]/85 border-emerald-900/40 shadow-lg shadow-emerald-950/20';
+
+  const avatarBgClass =
+    config.theme === 'kdrama'
+      ? 'bg-pink-600/20 border-pink-500/40 text-pink-200'
+      : config.theme === 'gamer'
+      ? 'bg-cyan-600/20 border-cyan-500/40 text-cyan-200'
+      : 'bg-emerald-600/20 border-emerald-500/40 text-emerald-200';
+
+  const tabActiveClass =
+    config.theme === 'kdrama'
+      ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-md shadow-pink-600/40'
+      : config.theme === 'gamer'
+      ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/40'
+      : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/40';
+
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-2.5">
+    <header className={`sticky top-0 z-40 backdrop-blur-xl border-b px-4 py-2.5 transition-all ${headerBgClass}`}>
       <div className="max-w-md mx-auto flex items-center justify-between">
         {/* Profile Info */}
         <div className="flex items-center gap-2.5">
           <button
             onClick={onOpenSettings}
-            className="flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700/80 p-1.5 pr-3 rounded-full border border-slate-700/60 transition-all text-left"
+            className="flex items-center gap-2 bg-slate-900/60 hover:bg-slate-800/80 p-1.5 pr-3 rounded-full border border-slate-700/60 backdrop-blur transition-all text-left"
           >
-            <span className="w-8 h-8 rounded-full bg-indigo-600/30 flex items-center justify-center text-lg shadow-inner">
+            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-inner border ${avatarBgClass}`}>
               {config.userAvatar}
             </span>
             <div>
@@ -58,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`p-2 rounded-full border transition-all ${
               testModeUnlocked
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm shadow-amber-500/30'
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700'
             }`}
             title="Тохиргоо (Einstellungen)"
           >
@@ -68,12 +89,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Navigation Sub-bar */}
-      <div className="max-w-md mx-auto flex items-center justify-around mt-2 pt-2 border-t border-slate-800/60">
+      <div className="max-w-md mx-auto flex items-center justify-around mt-2 pt-2 border-t border-slate-800/40">
         <button
           onClick={() => setActiveTab('chat')}
-          className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3 rounded-full transition-all ${
+          className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3.5 rounded-full transition-all ${
             activeTab === 'chat'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+              ? tabActiveClass
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -85,9 +106,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         {config.id === 'brother1' && (
           <button
             onClick={() => setActiveTab('squad')}
-            className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3 rounded-full transition-all ${
+            className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3.5 rounded-full transition-all ${
               activeTab === 'squad'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                ? tabActiveClass
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -98,9 +119,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <button
           onClick={() => setActiveTab('archive')}
-          className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3 rounded-full transition-all ${
+          className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3.5 rounded-full transition-all ${
             activeTab === 'archive'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+              ? tabActiveClass
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >

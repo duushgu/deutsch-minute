@@ -6,6 +6,7 @@ import { SquadLeaderboard } from './components/SquadLeaderboard';
 import { ArchiveScreen } from './components/ArchiveScreen';
 import { SettingsModal } from './components/SettingsModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { ThemeBackground } from './components/ThemeBackground';
 import { PROFILES } from './data/profiles';
 import { CURRICULUM } from './data/curriculum';
 import {
@@ -127,7 +128,10 @@ export const App: React.FC = () => {
   const themeClass = `theme-${config.theme}`;
 
   return (
-    <div className={`min-h-screen bg-slate-950 text-slate-100 flex flex-col ${themeClass}`}>
+    <div className={`min-h-screen text-slate-100 flex flex-col relative overflow-x-hidden ${themeClass}`}>
+      {/* Animated Immersive Theme Environment Background */}
+      <ThemeBackground theme={config.theme} />
+
       {/* Top Navigation */}
       <Navbar
         config={config}
@@ -139,7 +143,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto relative z-10">
         {activeTab === 'chat' && (
           <>
             {isTodayDone ? (

@@ -166,10 +166,37 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     onComplete(lesson.day, bonusXp);
   };
 
+  const isKdrama = config.theme === 'kdrama';
+  const isGamer = config.theme === 'gamer';
+
+  const timerCardClass = isKdrama
+    ? 'bg-[#180b26]/80 border-pink-900/50 shadow-pink-950/20'
+    : isGamer
+    ? 'bg-[#040c1b]/85 border-cyan-900/50 shadow-cyan-950/20'
+    : 'bg-[#031d15]/85 border-emerald-900/50 shadow-emerald-950/20';
+
+  const partnerBubbleClass = isKdrama
+    ? 'bg-[#1e0d2e]/85 border-pink-500/30 shadow-pink-950/20'
+    : isGamer
+    ? 'bg-[#06172a]/85 border-cyan-500/30 shadow-cyan-950/20'
+    : 'bg-[#05281e]/85 border-emerald-500/40 shadow-emerald-950/20';
+
+  const userBubbleClass = isKdrama
+    ? 'bg-[#29103c]/90 border-pink-500/40 shadow-pink-500/10'
+    : isGamer
+    ? 'bg-[#08223d]/90 border-cyan-500/50 shadow-cyan-500/15'
+    : 'bg-[#063828]/90 border-emerald-400/50 shadow-emerald-500/15';
+
+  const actionBtnClass = isKdrama
+    ? 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white shadow-pink-500/30'
+    : isGamer
+    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-cyan-500/30'
+    : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/30';
+
   return (
     <div className="max-w-md mx-auto p-4 pb-20 flex flex-col min-h-[calc(100vh-110px)]">
       {/* 60s Micro-Timer Header */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 mb-4 shadow-lg">
+      <div className={`border rounded-2xl p-3 mb-4 shadow-lg backdrop-blur-md transition-all ${timerCardClass}`}>
         <div className="flex items-center justify-between text-xs mb-1.5 font-mono">
           <span className="text-slate-400 flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
@@ -203,17 +230,19 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
       <div className="space-y-4 flex-1">
         {/* Turn 1: Partner Bubble */}
         <div className="flex items-start gap-2.5">
-          <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow shrink-0">
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${
+            isKdrama ? 'bg-pink-950/80 border-pink-500/40' : isGamer ? 'bg-cyan-950/80 border-cyan-500/40' : 'bg-emerald-950/80 border-emerald-500/40'
+          }`}>
             {partnerAvatar}
           </div>
-          <div className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3.5 shadow-md">
+          <div className={`flex-1 rounded-2xl rounded-tl-sm p-3.5 shadow-md backdrop-blur-md transition-all ${partnerBubbleClass}`}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold text-slate-300">
+              <span className="text-xs font-bold text-slate-200">
                 {partnerName}
               </span>
               <button
                 onClick={() => playAudio(turn1.audioKey, turn1.textDe)}
-                className="p-1 rounded-full bg-indigo-950/80 text-indigo-400 hover:bg-indigo-900 border border-indigo-800/60 transition-all"
+                className="p-1 rounded-full bg-slate-900/60 text-slate-300 hover:text-white border border-slate-700/60 transition-all"
                 title="Сонсох"
               >
                 <Volume2 className="w-4 h-4" />
@@ -224,7 +253,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
               {formatText(turn1.textDe)}
             </p>
             {/* Mongolian Translation */}
-            <p className="mt-1.5 text-xs text-slate-400">
+            <p className="mt-1.5 text-xs text-slate-300/90">
               {formatText(turn1.textMn)}
             </p>
           </div>
@@ -233,18 +262,20 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         {/* Turn 2: User Response / Challenge */}
         {currentStep >= 0 && (
           <div className="flex items-start gap-2.5 flex-row-reverse">
-            <div className="w-9 h-9 rounded-full bg-indigo-950 border border-indigo-700 flex items-center justify-center text-lg shadow shrink-0">
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${
+              isKdrama ? 'bg-purple-950/80 border-pink-400/50' : isGamer ? 'bg-cyan-950/80 border-cyan-400/50' : 'bg-emerald-950/80 border-emerald-400/50'
+            }`}>
               {config.userAvatar}
             </div>
-            <div className="flex-1 bg-slate-900/90 border border-indigo-900/50 rounded-2xl rounded-tr-sm p-3.5 shadow-md">
+            <div className={`flex-1 rounded-2xl rounded-tr-sm p-3.5 shadow-md backdrop-blur-md transition-all ${userBubbleClass}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-indigo-300">
+                <span className="text-xs font-bold text-white/90">
                   Чи ({userName})
                 </span>
                 {currentStep >= 2 && (
                   <button
                     onClick={() => playAudio(turn2.audioKey, turn2.textDe)}
-                    className="p-1 rounded-full bg-indigo-950/80 text-indigo-400 hover:bg-indigo-900 border border-indigo-800/60 transition-all"
+                    className="p-1 rounded-full bg-slate-900/60 text-slate-300 hover:text-white border border-slate-700/60 transition-all"
                     title="Сонсох"
                   >
                     <Volume2 className="w-4 h-4" />
@@ -290,7 +321,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                             <button
                               key={`sel_${idx}_${word}`}
                               onClick={() => handleWordDeselect(word, idx)}
-                              className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow transition-all active:scale-95"
+                              className={`px-2.5 py-1 rounded-lg text-white text-xs font-semibold shadow transition-all active:scale-95 ${actionBtnClass}`}
                             >
                               {word}
                             </button>
@@ -304,7 +335,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                           <button
                             key={`avail_${idx}_${word}`}
                             onClick={() => handleWordSelect(word, idx)}
-                            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold shadow transition-all active:scale-95"
+                            className="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-xs font-semibold shadow transition-all active:scale-95"
                           >
                             {word}
                           </button>
@@ -321,7 +352,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                       <button
                         onClick={handleCheckWordOrder}
                         disabled={selectedWords.length === 0}
-                        className="w-full mt-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow transition-all active:scale-98"
+                        className={`w-full mt-2 py-2.5 disabled:bg-slate-800 disabled:text-slate-600 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow transition-all active:scale-98 ${actionBtnClass}`}
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         Шалгах
@@ -336,12 +367,12 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                         <button
                           key={c.id}
                           onClick={() => handleChoiceSelect(c.isCorrect)}
-                          className="w-full text-left p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 transition-all active:scale-98"
+                          className="w-full text-left p-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-700/80 hover:border-slate-500 backdrop-blur transition-all active:scale-98"
                         >
                           <div className="text-xs font-bold text-white">
                             {formatText(c.textDe)}
                           </div>
-                          <div className="text-[10px] text-slate-400 mt-0.5">
+                          <div className="text-[10px] text-slate-300/90 mt-0.5">
                             {formatText(c.textMn)}
                           </div>
                         </button>
@@ -363,17 +394,19 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         {/* Partner Typing Indicator */}
         {isPartnerTyping && currentStep === 2 && (
           <div className="flex items-center gap-2.5 animate-pulse">
-            <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow shrink-0">
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${
+              isKdrama ? 'bg-pink-950/80 border-pink-500/40' : isGamer ? 'bg-cyan-950/80 border-cyan-500/40' : 'bg-emerald-950/80 border-emerald-500/40'
+            }`}>
               {partnerAvatar}
             </div>
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm px-4 py-2.5 shadow-md flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-medium">
+            <div className={`rounded-2xl rounded-tl-sm px-4 py-2.5 shadow-md flex items-center gap-2 backdrop-blur-md transition-all ${partnerBubbleClass}`}>
+              <span className="text-xs text-slate-300 font-medium">
                 {partnerName} бичиж байна...
               </span>
               <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -382,17 +415,19 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         {/* Turn 3: Partner Closing Reply */}
         {currentStep >= 3 && (
           <div className="flex items-start gap-2.5 animate-fadeIn">
-            <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow shrink-0">
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${
+              isKdrama ? 'bg-pink-950/80 border-pink-500/40' : isGamer ? 'bg-cyan-950/80 border-cyan-500/40' : 'bg-emerald-950/80 border-emerald-500/40'
+            }`}>
               {partnerAvatar}
             </div>
-            <div className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3.5 shadow-md">
+            <div className={`flex-1 rounded-2xl rounded-tl-sm p-3.5 shadow-md backdrop-blur-md transition-all ${partnerBubbleClass}`}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-bold text-slate-300">
+                <span className="text-xs font-bold text-slate-200">
                   {partnerName}
                 </span>
                 <button
                   onClick={() => playAudio(turn3.audioKey, turn3.textDe)}
-                  className="p-1 rounded-full bg-indigo-950/80 text-indigo-400 hover:bg-indigo-900 border border-indigo-800/60 transition-all"
+                  className="p-1 rounded-full bg-slate-900/60 text-slate-300 hover:text-white border border-slate-700/60 transition-all"
                   title="Сонсох"
                 >
                   <Volume2 className="w-4 h-4" />

@@ -24,10 +24,10 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
   return (
     <div className="max-w-md mx-auto p-4 pb-24 space-y-4">
       {/* Squad Header Banner */}
-      <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 border border-indigo-500/30 rounded-3xl p-5 shadow-xl">
+      <div className="bg-gradient-to-r from-[#07172e] via-[#041d33] to-[#082b3d] border border-cyan-500/40 rounded-3xl p-5 shadow-xl backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-indigo-400 font-bold">
+            <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-cyan-400 font-bold">
               <Users className="w-4 h-4" />
               Гэр бүлийн баг (Squad)
             </div>
@@ -57,16 +57,16 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
           return (
             <div
               key={id}
-              className={`p-4 rounded-2xl border transition-all ${
+              className={`p-4 rounded-2xl border transition-all backdrop-blur-md ${
                 isCurrentActive
-                  ? 'bg-slate-900 border-indigo-500/80 shadow-lg shadow-indigo-500/10'
-                  : 'bg-slate-900/70 border-slate-800/80 hover:border-slate-700'
+                  ? 'bg-[#061b34]/90 border-cyan-500/80 shadow-lg shadow-cyan-500/20'
+                  : 'bg-[#040e1f]/75 border-cyan-900/40 hover:border-cyan-700/60'
               }`}
             >
               <div className="flex items-center justify-between">
                 {/* Avatar & Identity */}
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl shadow">
+                  <div className="w-12 h-12 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center text-2xl shadow">
                     {config.userAvatar}
                   </div>
                   <div>
@@ -75,7 +75,7 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                         {progress.name || config.name}
                       </span>
                       {isCurrentActive && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold border border-emerald-800/60">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 font-bold border border-cyan-800/60">
                           Чи
                         </span>
                       )}
@@ -112,7 +112,7 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                       Дууссан
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-full border border-slate-700">
+                    <div className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 bg-black/40 px-2.5 py-1 rounded-full border border-white/10">
                       <Clock className="w-3.5 h-3.5" />
                       Хүлээгдэж байна
                     </div>
@@ -121,8 +121,8 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
               </div>
 
               {/* Stats Row */}
-              <div className="mt-3 pt-3 border-t border-slate-800/80 grid grid-cols-3 gap-2 text-center">
-                <div className="bg-slate-950/50 p-2 rounded-xl border border-slate-800/60">
+              <div className="mt-3 pt-3 border-t border-white/10 grid grid-cols-3 gap-2 text-center">
+                <div className="bg-black/30 p-2 rounded-xl border border-white/5">
                   <div className="text-[10px] text-slate-400">Цуврал</div>
                   <div className="text-sm font-bold text-amber-400 flex items-center justify-center gap-1 font-mono">
                     <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
@@ -130,14 +130,14 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                   </div>
                 </div>
 
-                <div className="bg-slate-950/50 p-2 rounded-xl border border-slate-800/60">
+                <div className="bg-black/30 p-2 rounded-xl border border-white/5">
                   <div className="text-[10px] text-slate-400">Өдөр</div>
-                  <div className="text-sm font-bold text-indigo-300 font-mono">
+                  <div className="text-sm font-bold text-cyan-300 font-mono">
                     {progress.currentDay}/60
                   </div>
                 </div>
 
-                <div className="bg-slate-950/50 p-2 rounded-xl border border-slate-800/60">
+                <div className="bg-black/30 p-2 rounded-xl border border-white/5">
                   <div className="text-[10px] text-slate-400">Нийт оноо</div>
                   <div className="text-sm font-bold text-purple-300 font-mono">
                     {progress.xp} XP

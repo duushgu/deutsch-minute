@@ -15,16 +15,16 @@
 .theme-kdrama {
   --primary-glow: #ec4899;
   --accent-color: #f43f5e;
-  --bubble-partner: #382947;
-  --bubble-user: #4c1d95;
+  --bubble-partner: rgba(56, 41, 71, 0.85);
+  --bubble-user: rgba(76, 29, 149, 0.85);
   --border-glow: #e879f9;
 }
 
 .theme-gamer {
   --primary-glow: #06b6d4;
   --accent-color: #10b981;
-  --bubble-partner: #0f2c42;
-  --bubble-user: #044e54;
+  --bubble-partner: rgba(15, 44, 66, 0.85);
+  --bubble-user: rgba(4, 78, 84, 0.85);
   --border-glow: #22d3ee;
 }
 
@@ -32,9 +32,141 @@
 .theme-cozy {
   --primary-glow: #10b981;
   --accent-color: #f59e0b;
-  --bubble-partner: #064e3b;
-  --bubble-user: #065f46;
+  --bubble-partner: rgba(6, 78, 59, 0.85);
+  --bubble-user: rgba(6, 95, 70, 0.85);
   --border-glow: #34d399;
+}
+
+/* 1. Slow ambient aura pulsing & drift */
+@keyframes aura-slow {
+  0%, 100% {
+    transform: scale(1) translate(0px, 0px);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15) translate(15px, -15px);
+    opacity: 1;
+  }
+}
+
+@keyframes aura-reverse {
+  0%, 100% {
+    transform: scale(1) translate(0px, 0px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1) translate(-15px, 20px);
+    opacity: 0.9;
+  }
+}
+
+.animate-aura-slow {
+  animation: aura-slow 8s infinite ease-in-out;
+}
+
+.animate-aura-reverse {
+  animation: aura-reverse 10s infinite ease-in-out;
+}
+
+/* 2. Demon Slayer / MHA Hero Sparks drifting upward */
+.hero-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: #34d399;
+  box-shadow: 0 0 8px #10b981, 0 0 12px #f59e0b;
+  opacity: 0;
+  animation: spark-up 4s infinite linear;
+}
+
+.spark-1 { left: 15%; animation-duration: 3.5s; animation-delay: 0.2s; }
+.spark-2 { left: 35%; animation-duration: 4.5s; animation-delay: 1.5s; width: 5px; height: 5px; background-color: #f59e0b; }
+.spark-3 { left: 55%; animation-duration: 3.8s; animation-delay: 0.8s; }
+.spark-4 { left: 75%; animation-duration: 4.2s; animation-delay: 2.2s; width: 6px; height: 6px; }
+.spark-5 { left: 88%; animation-duration: 3.2s; animation-delay: 1.1s; background-color: #f59e0b; }
+.spark-6 { left: 25%; animation-duration: 4.8s; animation-delay: 3s; }
+
+@keyframes spark-up {
+  0% {
+    bottom: -10px;
+    opacity: 0;
+    transform: translateX(0) scale(0.6);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    bottom: 105%;
+    opacity: 0;
+    transform: translateX(25px) scale(1.2);
+  }
+}
+
+/* 3. Mobile Legends Tactical Scanline */
+.hud-scanline {
+  animation: scanline-move 6s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes scanline-move {
+  0% {
+    top: -5%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    top: 105%;
+    opacity: 0;
+  }
+}
+
+/* 4. K-Drama Falling Sakura Petals */
+.sakura-petal {
+  position: absolute;
+  top: -30px;
+  font-size: 14px;
+  opacity: 0;
+  animation: sakura-fall 7s infinite ease-in-out;
+  user-select: none;
+  filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.4));
+}
+
+.petal-1 { left: 10%; animation-duration: 6.5s; animation-delay: 0s; font-size: 16px; }
+.petal-2 { left: 30%; animation-duration: 8s; animation-delay: 2.5s; font-size: 12px; }
+.petal-3 { left: 50%; animation-duration: 7s; animation-delay: 1s; font-size: 18px; }
+.petal-4 { left: 70%; animation-duration: 7.5s; animation-delay: 3.2s; font-size: 14px; }
+.petal-5 { left: 85%; animation-duration: 6s; animation-delay: 1.8s; font-size: 12px; }
+.petal-6 { left: 22%; animation-duration: 9s; animation-delay: 4s; font-size: 15px; }
+
+@keyframes sakura-fall {
+  0% {
+    top: -20px;
+    opacity: 0;
+    transform: translateX(0) rotate(0deg);
+  }
+  15% {
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateX(30px) rotate(180deg);
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    top: 105%;
+    opacity: 0;
+    transform: translateX(-20px) rotate(360deg);
+  }
 }
 
 /* Pulsing glow animation */
@@ -53,7 +185,7 @@
   animation: pulse-glow 2s infinite ease-in-out;
 }
 
-@keyframes hero-spark {
+@keyframes hero-spark-glow {
   0%, 100% {
     box-shadow: 0 0 12px rgba(16, 185, 129, 0.4), 0 0 24px rgba(245, 158, 11, 0.2);
   }
@@ -63,5 +195,5 @@
 }
 
 .animate-hero-spark {
-  animation: hero-spark 2.5s infinite ease-in-out;
+  animation: hero-spark-glow 2.5s infinite ease-in-out;
 }

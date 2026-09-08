@@ -28,10 +28,31 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
   const userName = progress.name || config.name;
   const partnerName = progress.partnerName || config.partnerName;
 
+  const isKdrama = config.theme === 'kdrama';
+  const isGamer = config.theme === 'gamer';
+
+  const headerClass = isKdrama
+    ? 'bg-[#180b26]/85 border-pink-900/40 shadow-pink-950/20'
+    : isGamer
+    ? 'bg-[#040e1f]/85 border-cyan-900/40 shadow-cyan-950/20'
+    : 'bg-[#021812]/85 border-emerald-900/40 shadow-emerald-950/20';
+
+  const completedCardClass = isKdrama
+    ? 'bg-[#1b0d2d]/80 border-pink-900/50'
+    : isGamer
+    ? 'bg-[#051428]/80 border-cyan-900/50'
+    : 'bg-[#032017]/80 border-emerald-900/50';
+
+  const currentCardClass = isKdrama
+    ? 'bg-[#260f3a]/90 border-pink-500/60 shadow-md shadow-pink-500/20'
+    : isGamer
+    ? 'bg-[#061b34]/90 border-cyan-500/60 shadow-md shadow-cyan-500/20'
+    : 'bg-[#04291f]/90 border-emerald-500/60 shadow-md shadow-emerald-500/20';
+
   return (
     <div className="max-w-md mx-auto p-4 pb-24 space-y-4">
       {/* Header */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-lg">
+      <div className={`border rounded-3xl p-5 shadow-lg backdrop-blur-md transition-all ${headerClass}`}>
         <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-1">
           <BookOpen className="w-4 h-4" />
           Ярианы сан (Архив)
@@ -56,12 +77,12 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
           return (
             <div
               key={lesson.day}
-              className={`rounded-2xl border transition-all overflow-hidden ${
+              className={`rounded-2xl border transition-all overflow-hidden backdrop-blur-sm ${
                 isCompleted
-                  ? 'bg-slate-900/90 border-emerald-900/40'
+                  ? completedCardClass
                   : isCurrent
-                  ? 'bg-slate-900/90 border-indigo-500/60 shadow-md shadow-indigo-500/10'
-                  : 'bg-slate-900/40 border-slate-800/50 opacity-60'
+                  ? currentCardClass
+                  : 'bg-slate-950/40 border-white/5 opacity-60'
               }`}
             >
               {/* Day Header Row */}
