@@ -215,35 +215,153 @@ export function completeDayLesson(state: SquadState, profileId: ProfileId, day: 
   return updatedState;
 }
 
-// Background silent sync
+export const FIREBASE_RTDB_BASE = 'https://deutsch-minute-default-rtdb.firebaseio.com';
+export const FIREBASE_SQUAD_URL = `${FIREBASE_RTDB_BASE}/squad`;
+
+// Background silent push to Firebase Realtime Database
 export async function silentCloudSync(state: SquadState): Promise<boolean> {
-  const syncEndpoints = [
-    state.cloudSyncUrl,
-    'http://192.168.1.169:8767/api/sync', // Local ultra2 sync daemon fallback
-  ].filter(Boolean) as string[];
-
-  if (syncEndpoints.length === 0) return false;
-
   const active = state.activeProfileId;
-  const payload = {
-    profileId: active,
-    progress: state.profiles[active],
-    allProfiles: state.profiles,
-    timestamp: Date.now(),
-  };
+  const activeProgress = state.profiles[active];
+  if (!activeProgress) return false;
 
-  for (const endpoint of syncEndpoints) {
-    try {
-      const resp = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (resp.ok) return true;
-    } catch {
-      // Ignore network errors silently
-    }
+  const url = `${FIREBASE_SQUAD_URL}/${active}.json`;
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const resp = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(activeProgress),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    // Also update ultra2 local fallback daemon if reachable
+    fetch('http://192.168.1.169:8767/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profileId: active,
+        progress: activeProgress,
+        allProfiles: state.profiles,
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+
+    return resp.ok;
+  } catch {
+    // Ignore network errors silently (offline first)
+    return false;
   }
+}
 
-  return false;
+// Background smart fetch and merge with Firebase Realtime Database
+export async function syncWithCloud(currentState: SquadState): Promise<SquadState> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const resp = await fetch(`${FIREBASE_SQUAD_URL}.json`, {
+      method: 'GET',
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (!resp.ok) return currentState;
+    const remoteData = (await resp.json()) as Record<string, Partial<SiblingProgress>> | null;
+
+    if (!remoteData || typeof remoteData !== 'object') {
+      // Remote is empty, push current active profile to seed Firebase
+      silentCloudSync(currentState).catch(() => {});
+      return currentState;
+    }
+
+    let hasChanges = false;
+    const mergedProfiles = { ...currentState.profiles };
+    const siblingIds: ProfileId[] = ['sister', 'brother1', 'brother2'];
+
+    for (const id of siblingIds) {
+      const remote = remoteData[id];
+      const local = currentState.profiles[id];
+
+      if (!remote) {
+        if (id === currentState.activeProfileId) {
+          silentCloudSync(currentState).catch(() => {});
+        }
+        continue;
+      }
+
+      const defaultProf = createDefaultSiblingProgress(id);
+
+      if (id !== currentState.activeProfileId) {
+        // For other siblings: remote is source of truth because they use their own phone
+        const updatedOther: SiblingProgress = {
+          ...defaultProf,
+          ...local,
+          ...remote,
+          profileId: id,
+          completedDays: Array.isArray(remote.completedDays) ? remote.completedDays : (local?.completedDays || []),
+          badges: Array.isArray(remote.badges) ? remote.badges : (local?.badges || []),
+        };
+
+        if (!local || JSON.stringify(local) !== JSON.stringify(updatedOther)) {
+          mergedProfiles[id] = updatedOther;
+          hasChanges = true;
+        }
+      } else {
+        // For current active child on this phone:
+        const localDays = local?.completedDays?.length || 0;
+        const remoteDays = remote?.completedDays?.length || 0;
+        const localTime = local?.lastActiveTimestamp || 0;
+        const remoteTime = remote?.lastActiveTimestamp || 0;
+
+        // Remote has completed onboarding while local has not: restore remote profile
+        const shouldRestoreOnboarding = !local?.hasCompletedOnboarding && remote.hasCompletedOnboarding;
+
+        if (
+          shouldRestoreOnboarding ||
+          remoteDays > localDays ||
+          (remoteDays === localDays && remoteTime > localTime)
+        ) {
+          const mergedActive: SiblingProgress = {
+            ...defaultProf,
+            ...local,
+            ...remote,
+            profileId: id,
+            name: remote.name || local?.name || defaultProf.name,
+            partnerName: remote.partnerName || local?.partnerName || defaultProf.partnerName,
+            partnerAvatar: remote.partnerAvatar || local?.partnerAvatar || defaultProf.partnerAvatar,
+            completedDays: Array.isArray(remote.completedDays) ? remote.completedDays : (local?.completedDays || []),
+            badges: Array.isArray(remote.badges) ? remote.badges : (local?.badges || []),
+          };
+          mergedProfiles[id] = mergedActive;
+          hasChanges = true;
+        } else if (localDays > remoteDays || localTime > remoteTime) {
+          // Local is ahead, push local to Firebase
+          silentCloudSync(currentState).catch(() => {});
+        }
+      }
+    }
+
+    if (hasChanges) {
+      const newState: SquadState = {
+        ...currentState,
+        profiles: mergedProfiles,
+        lastSyncTimestamp: Date.now(),
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+      } catch (e) {
+        console.error(e);
+      }
+      return newState;
+    }
+
+    return currentState;
+  } catch {
+    // Offline or network error: gracefully keep current state
+    return currentState;
+  }
 }

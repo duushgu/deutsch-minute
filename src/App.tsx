@@ -13,6 +13,7 @@ import {
   completeDayLesson,
   isCompletedToday,
   updateOnboarding,
+  syncWithCloud,
 } from './services/storage';
 import { ProfileId, SquadState } from './types';
 
@@ -41,6 +42,41 @@ export const App: React.FC = () => {
   useEffect(() => {
     document.title = `${displayName} ${partnerAvatar} Герман хэл`;
   }, [displayName, partnerAvatar]);
+
+  // Silent sync with Firebase Realtime Database
+  useEffect(() => {
+    let mounted = true;
+    syncWithCloud(squadState).then((latest) => {
+      if (mounted) setSquadState(latest);
+    });
+
+    const handleSync = () => {
+      syncWithCloud(squadState).then((latest) => {
+        if (mounted) setSquadState(latest);
+      });
+    };
+
+    window.addEventListener('focus', handleSync);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') handleSync();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    const interval = setInterval(handleSync, 30000);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener('focus', handleSync);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleTabChange = (tab: 'chat' | 'squad' | 'archive') => {
+    setActiveTab(tab);
+    if (tab === 'squad') {
+      syncWithCloud(squadState).then(setSquadState);
+    }
+  };
 
   const handleCompleteLesson = (day: number) => {
     const updated = completeDayLesson(squadState, activeProfile, day);
@@ -79,7 +115,7 @@ export const App: React.FC = () => {
         config={config}
         progress={progress}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         onOpenSettings={() => setIsSettingsOpen(true)}
         testModeUnlocked={squadState.testModeUnlocked}
       />
@@ -95,8 +131,6 @@ export const App: React.FC = () => {
                 progress={progress}
                 partnerName={partnerName}
                 partnerAvatar={partnerAvatar}
-                onNavigateToSquad={() => setActiveTab('squad')}
-                onNavigateToArchive={() => setActiveTab('archive')}
               />
             ) : (
               <ChatSession

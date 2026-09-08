@@ -36,10 +36,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{progress.name || config.name}</span>
                 <span className="text-xs">{progress.partnerAvatar || config.partnerAvatar}</span>
               </div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-1.5">
+              <div className="text-[10px] text-slate-400">
                 <span>Tag {progress.currentDay}/60</span>
-                <span>•</span>
-                <span className="text-emerald-400">☁️ Sync</span>
               </div>
             </div>
           </button>
@@ -62,7 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm shadow-amber-500/30'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
             }`}
-            title="Einstellungen & Geschwister-Sync"
+            title="Тохиргоо (Einstellungen)"
           >
             <Settings className="w-4 h-4" />
           </button>

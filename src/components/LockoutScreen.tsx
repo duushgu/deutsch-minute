@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Volume2, Sparkles, Flame, Users, BookOpen, ShieldCheck } from 'lucide-react';
+import { Clock, Volume2, Sparkles, Flame, BookOpen, ShieldCheck } from 'lucide-react';
 import { DayLesson, ProfileConfig, SiblingProgress } from '../types';
 import { audioPlayer } from '../services/audioPlayer';
 
@@ -9,8 +9,8 @@ interface LockoutScreenProps {
   progress: SiblingProgress;
   partnerName: string;
   partnerAvatar: string;
-  onNavigateToSquad: () => void;
-  onNavigateToArchive: () => void;
+  onNavigateToSquad?: () => void;
+  onNavigateToArchive?: () => void;
 }
 
 export const LockoutScreen: React.FC<LockoutScreenProps> = ({
@@ -19,8 +19,6 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
   progress,
   partnerName,
   partnerAvatar: _partnerAvatar,
-  onNavigateToSquad,
-  onNavigateToArchive,
 }) => {
   const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number }>({
     hours: 0,
@@ -176,25 +174,6 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="pt-2 space-y-2">
-        <button
-          onClick={onNavigateToSquad}
-          className="w-full py-3 px-4 rounded-2xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-98 shadow"
-        >
-          <Users className="w-4 h-4 text-indigo-400" />
-          Geschwister-Squad ansehen (Wer lernt noch?)
-        </button>
-
-        <button
-          onClick={onNavigateToArchive}
-          className="w-full py-2.5 px-4 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 transition-all active:scale-98"
-        >
-          <BookOpen className="w-4 h-4 text-slate-400" />
-          Frühere Dialoge im Archiv wiederholen
-        </button>
       </div>
     </div>
   );
