@@ -3,6 +3,7 @@ import { BookOpen, CheckCircle2, Lock, Volume2, ChevronDown, ChevronUp } from 'l
 import { DayLesson, ProfileConfig, SiblingProgress } from '../types';
 import { CURRICULUM } from '../data/curriculum';
 import { audioPlayer } from '../services/audioPlayer';
+import { formatDialogueText } from '../services/storage';
 
 interface ArchiveScreenProps {
   config: ProfileConfig;
@@ -24,27 +25,31 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
     audioPlayer.play(audioKey, textDe);
   };
 
+  const userName = progress.name || config.name;
+  const partnerName = progress.partnerName || config.partnerName;
+
   return (
     <div className="max-w-md mx-auto p-4 pb-24 space-y-4">
       {/* Header */}
       <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-lg">
         <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-1">
           <BookOpen className="w-4 h-4" />
-          A1.1 Dialog-Archiv
+          Ярианы сан (Архив)
         </div>
         <h2 className="text-xl font-black text-white">
-          Wiederholung & Hörtraining
+          Өмнөх өдрүүдийн яриаг давтах
         </h2>
         <p className="text-xs text-slate-400 mt-1">
-          Hier kannst du alle bereits freigeschalteten Dialoge jederzeit noch einmal anhören und nachsprechen.
+          Өмнө нь сурсан бүх яриагаа хүссэн үедээ дахин сонсож, давтаж болно. 🎧
         </p>
       </div>
 
       {/* Lesson List */}
       <div className="space-y-2.5">
         {lessons.map((lesson) => {
-          const isCompleted = progress.completedDays.includes(lesson.day);
-          const isCurrent = progress.currentDay === lesson.day;
+          const completedDays = Array.isArray(progress.completedDays) ? progress.completedDays : [];
+          const isCompleted = completedDays.includes(lesson.day);
+          const isCurrent = (progress.currentDay || 1) === lesson.day;
           const isLocked = !isCompleted && !isCurrent;
           const isExpanded = expandedDay === lesson.day;
 
@@ -80,12 +85,12 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
                     ) : isLocked ? (
                       <Lock className="w-4 h-4" />
                     ) : (
-                      `T${lesson.day}`
+                      `Т${lesson.day}`
                     )}
                   </div>
                   <div>
                     <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                      Tag {lesson.day}: {lesson.topic}
+                      {lesson.day}-р өдөр: {lesson.topic}
                     </div>
                     <div className="text-[11px] text-slate-400">
                       {lesson.topicMn}
@@ -110,7 +115,7 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
               {isExpanded && !isLocked && (
                 <div className="p-4 pt-1 bg-slate-950/70 border-t border-slate-800 space-y-3">
                   <div className="text-[11px] font-mono text-indigo-300 font-semibold">
-                    Fokus: {lesson.grammarFocus}
+                    Гол сэдэв: {lesson.grammarFocus}
                   </div>
 
                   <div className="space-y-2">
@@ -121,24 +126,23 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
                       >
                         <div>
                           <div className="text-[10px] font-bold text-slate-400 mb-0.5">
-                            {turn.speaker === 'partner'
-                              ? config.partnerName
-                              : config.name}
+                            {turn.speaker === 'partner' ? partnerName : userName}
                           </div>
                           <div className="text-xs font-semibold text-white">
-                            {turn.textDe}
+                            {formatDialogueText(turn.textDe, config.name, userName, config.partnerName, partnerName)}
                           </div>
                           <div className="text-[11px] font-mono text-indigo-400">
-                            {turn.phoneticMn}
+                            {formatDialogueText(turn.phoneticMn, config.name, userName, config.partnerName, partnerName)}
                           </div>
                           <div className="text-[10px] text-slate-400">
-                            {turn.textMn}
+                            {formatDialogueText(turn.textMn, config.name, userName, config.partnerName, partnerName)}
                           </div>
                         </div>
 
                         <button
                           onClick={() => playAudio(turn.audioKey, turn.textDe)}
                           className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 shrink-0 active:scale-95"
+                          title="Сонсох"
                         >
                           <Volume2 className="w-3.5 h-3.5" />
                         </button>

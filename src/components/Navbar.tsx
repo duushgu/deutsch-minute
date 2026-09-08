@@ -37,7 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-xs">{progress.partnerAvatar || config.partnerAvatar}</span>
               </div>
               <div className="text-[10px] text-slate-400">
-                <span>Tag {progress.currentDay}/60</span>
+                <span>{progress.currentDay}/60-р өдөр</span>
               </div>
             </div>
           </button>
@@ -102,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           }`}
         >
           <BookOpen className="w-3.5 h-3.5" />
-          Archiv
+          Архив
         </button>
       </div>
     </header>

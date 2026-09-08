@@ -1,4 +1,18 @@
-// Native MP3 Player with Web Speech fallback
+// Dynamic audio URL resolver for GitHub Pages subpaths and multi-page apps
+export function getAudioUrl(audioKey: string): string {
+  if (typeof window === 'undefined') return `audio/${audioKey}.mp3`;
+  const pathname = window.location.pathname;
+  // If hosted on GitHub Pages under /deutsch-minute/
+  const ghMatch = pathname.match(/^(.*\/deutsch-minute)\//);
+  if (ghMatch) {
+    return `${ghMatch[1]}/audio/${audioKey}.mp3`;
+  }
+  // If on a subpage like /mongonchimeg/, /tomoo/, /jijgee/
+  if (pathname.includes('/mongonchimeg') || pathname.includes('/tomoo') || pathname.includes('/jijgee')) {
+    return `../audio/${audioKey}.mp3`;
+  }
+  return `audio/${audioKey}.mp3`;
+}
 
 class AudioPlayer {
   private currentAudio: HTMLAudioElement | null = null;
@@ -6,7 +20,7 @@ class AudioPlayer {
   async play(audioKey: string, fallbackText?: string): Promise<void> {
     this.stop();
 
-    const audioUrl = `audio/${audioKey}.mp3`;
+    const audioUrl = getAudioUrl(audioKey);
     try {
       const audio = new Audio(audioUrl);
       this.currentAudio = audio;

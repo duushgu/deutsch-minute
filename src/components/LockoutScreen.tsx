@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Volume2, Sparkles, Flame, BookOpen, ShieldCheck } from 'lucide-react';
 import { DayLesson, ProfileConfig, SiblingProgress } from '../types';
 import { audioPlayer } from '../services/audioPlayer';
+import { formatDialogueText } from '../services/storage';
 
 interface LockoutScreenProps {
   lesson: DayLesson;
@@ -31,7 +32,7 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
     const calculateTimeLeft = () => {
       const now = new Date();
       const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-      const diffMs = tomorrow.getTime() - now.getTime();
+      const diffMs = Math.max(0, tomorrow.getTime() - now.getTime());
 
       const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((diffMs / 1000 / 60) % 60);
@@ -49,6 +50,8 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
     audioPlayer.play(audioKey, textDe);
   };
 
+  const userName = progress.name || config.name;
+
   return (
     <div className="max-w-md mx-auto p-4 pb-24 space-y-4">
       {/* Lockout Header Card */}
@@ -61,10 +64,10 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
         </div>
 
         <h2 className="text-xl font-black text-white tracking-wide">
-          Heutige Mission geschafft!
+          Өнөөдрийн 1 минут дууслаа! 🌟
         </h2>
-        <p className="text-xs text-indigo-300 font-medium mt-0.5">
-          Өнөөдрийн 1 минут дууслаа! Маш сайн ажиллалаа.
+        <p className="text-xs text-indigo-300 font-medium mt-1">
+          Гайхалтай! Маргааш дараагийн даалгавар нээгдэнэ.
         </p>
 
         {/* Streak & XP Stats */}
@@ -72,7 +75,7 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700">
             <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
             <span className="text-xs font-bold text-amber-300 font-mono">
-              {progress.streak} Tage Streak
+              {progress.streak} өдөр дараалан
             </span>
           </div>
 
@@ -88,16 +91,13 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
         <div className="mt-5 pt-4 border-t border-indigo-900/40">
           <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mb-1 flex items-center justify-center gap-1">
             <Clock className="w-3.5 h-3.5 text-indigo-400" />
-            Nächste Mission freigeschaltet in
+            Дараагийн даалгавар нээгдэх хугацаа:
           </div>
           <div className="text-2xl font-black font-mono text-indigo-200 tracking-wider">
             {String(timeLeft.hours).padStart(2, '0')}:
             {String(timeLeft.minutes).padStart(2, '0')}:
             {String(timeLeft.seconds).padStart(2, '0')}
           </div>
-          <p className="text-[10px] text-slate-500 mt-1">
-            (Nur 1 Minute täglich für maximale neuronale Festigung!)
-          </p>
         </div>
       </div>
 
@@ -106,9 +106,9 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            Tag {lesson.day} • Dialog-Rückblick
+            {lesson.day}-р өдөр • Яриаг давтах
           </h3>
-          <span className="text-[10px] text-slate-500">Audio wiederholen</span>
+          <span className="text-[10px] text-slate-500">Сонсох 🔊</span>
         </div>
 
         <div className="space-y-2.5">
@@ -119,29 +119,23 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
             >
               <div>
                 <div className="text-[11px] font-bold text-indigo-300 mb-0.5">
-                  {turn.speaker === 'partner' ? partnerName : (progress.name || config.name)}
+                  {turn.speaker === 'partner' ? partnerName : userName}
                 </div>
                 <div className="text-sm font-semibold text-white">
-                  {turn.textDe
-                    .replace(new RegExp(config.name, 'g'), progress.name || config.name)
-                    .replace(new RegExp(config.partnerName, 'g'), partnerName)}
+                  {formatDialogueText(turn.textDe, config.name, userName, config.partnerName, partnerName)}
                 </div>
                 <div className="text-[11px] font-mono text-indigo-400">
-                  {turn.phoneticMn
-                    .replace(new RegExp(config.name, 'g'), progress.name || config.name)
-                    .replace(new RegExp(config.partnerName, 'g'), partnerName)}
+                  {formatDialogueText(turn.phoneticMn, config.name, userName, config.partnerName, partnerName)}
                 </div>
                 <div className="text-[10px] text-slate-400 mt-0.5">
-                  {turn.textMn
-                    .replace(new RegExp(config.name, 'g'), progress.name || config.name)
-                    .replace(new RegExp(config.partnerName, 'g'), partnerName)}
+                  {formatDialogueText(turn.textMn, config.name, userName, config.partnerName, partnerName)}
                 </div>
               </div>
 
               <button
                 onClick={() => playAudio(turn.audioKey, turn.textDe)}
                 className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 shrink-0 transition-all active:scale-95"
-                title="Audio anhören"
+                title="Сонсох"
               >
                 <Volume2 className="w-4 h-4" />
               </button>
@@ -154,7 +148,7 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
       <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-md">
         <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
           <BookOpen className="w-4 h-4 text-amber-400" />
-          Wortschatz des Tages (3 Chunks)
+          Өнөөдрийн чухал үгс (3 үг)
         </h3>
         <div className="grid grid-cols-1 gap-2">
           {lesson.keyVocab.map((vocab, i) => (

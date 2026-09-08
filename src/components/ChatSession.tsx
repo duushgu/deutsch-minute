@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { DayLesson, ProfileConfig } from '../types';
 import { audioPlayer } from '../services/audioPlayer';
 import { soundFX } from '../services/soundEffects';
+import { formatDialogueText } from '../services/storage';
 
 interface ChatSessionProps {
   lesson: DayLesson;
@@ -39,11 +40,16 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   const turn3 = lesson.dialogue[2]; // Partner close
 
   const formatText = (text: string) => {
-    if (!text) return text;
-    return text
-      .replace(new RegExp(config.name, 'g'), userName)
-      .replace(new RegExp(config.partnerName, 'g'), partnerName);
+    return formatDialogueText(text, config.name, userName, config.partnerName, partnerName);
   };
+
+  // Reset state and timer when lesson changes
+  useEffect(() => {
+    setCurrentStep(0);
+    setSelectedWords([]);
+    setHasError(false);
+    setElapsedSeconds(0);
+  }, [lesson.day]);
 
   // Timer: counts up to 60 seconds
   useEffect(() => {
@@ -57,7 +63,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   useEffect(() => {
     if (turn2?.challenge?.type === 'word_order' && turn2.challenge.scrambledWords) {
       const formattedWords = turn2.challenge.scrambledWords.map((w) =>
-        w.replace(config.name, userName).replace(config.partnerName, partnerName)
+        formatDialogueText(w, config.name, userName, config.partnerName, partnerName)
       );
       setAvailableWords([...formattedWords]);
       setSelectedWords([]);
@@ -149,7 +155,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         <div className="flex items-center justify-between text-xs mb-1.5 font-mono">
           <span className="text-slate-400 flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            Tag {lesson.day} • {lesson.topic}
+            {lesson.day}-р өдөр • {lesson.topic}
           </span>
           <span className="font-bold text-amber-400">
             {elapsedSeconds}s / 60s
@@ -182,7 +188,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
               <button
                 onClick={() => playAudio(turn1.audioKey, turn1.textDe)}
                 className="p-1 rounded-full bg-indigo-950/80 text-indigo-400 hover:bg-indigo-900 border border-indigo-800/60 transition-all"
-                title="Audio abspielen"
+                title="Сонсох"
               >
                 <Volume2 className="w-4 h-4" />
               </button>
@@ -211,12 +217,13 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
             <div className="flex-1 bg-slate-900/90 border border-indigo-900/50 rounded-2xl rounded-tr-sm p-3.5 shadow-md">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-indigo-300">
-                  Du ({userName})
+                  Чи ({userName})
                 </span>
                 {currentStep >= 2 && (
                   <button
                     onClick={() => playAudio(turn2.audioKey, turn2.textDe)}
                     className="p-1 rounded-full bg-indigo-950/80 text-indigo-400 hover:bg-indigo-900 border border-indigo-800/60 transition-all"
+                    title="Сонсох"
                   >
                     <Volume2 className="w-4 h-4" />
                   </button>
@@ -241,7 +248,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                 /* Unsolved Challenge */
                 <div>
                   <div className="text-xs font-medium text-slate-300 mb-2">
-                    Setze die richtige Antwort zusammen:
+                    Зөв хариултыг эвлүүлнэ үү:
                   </div>
 
                   {/* Word-Order Challenge Type */}
@@ -257,7 +264,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                       >
                         {selectedWords.length === 0 ? (
                           <span className="text-xs text-slate-500 italic">
-                            Tippe die Wörter unten an...
+                            Доорх үгсээс дарж сонгоно уу...
                           </span>
                         ) : (
                           selectedWords.map((word, idx) => (
@@ -287,7 +294,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
 
                       {hasError && (
                         <div className="text-[11px] text-rose-400 font-medium">
-                          Noch nicht ganz! Probiere die Reihenfolge noch einmal.
+                          Дараалал нь арай буруу байна. Дахин оролдоод үзээрэй! 🔄
                         </div>
                       )}
 
@@ -298,7 +305,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                         className="w-full mt-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow transition-all active:scale-98"
                       >
                         <CheckCircle2 className="w-4 h-4" />
-                        Prüfen / Шалгах
+                        Шалгах
                       </button>
                     </div>
                   )}
@@ -313,20 +320,20 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                           className="w-full text-left p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 transition-all active:scale-98"
                         >
                           <div className="text-xs font-bold text-white">
-                            {c.textDe}
+                            {formatText(c.textDe)}
                           </div>
                           <div className="text-[10px] text-indigo-300 font-mono mt-0.5">
-                            {c.phoneticMn}
+                            {formatText(c.phoneticMn)}
                           </div>
                           <div className="text-[10px] text-slate-400 mt-0.5">
-                            {c.textMn}
+                            {formatText(c.textMn)}
                           </div>
                         </button>
                       ))}
 
                       {hasError && (
                         <div className="text-[11px] text-rose-400 font-medium pt-1">
-                          Das passt inhaltlich nicht ganz. Wähle die passende Antwort!
+                          Энэ арай тохирохгүй байна. Өөр хариулт сонгоод үзээрэй! 💡
                         </div>
                       )}
                     </div>
@@ -351,6 +358,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                 <button
                   onClick={() => playAudio(turn3.audioKey, turn3.textDe)}
                   className="p-1 rounded-full bg-indigo-950/80 text-indigo-400 hover:bg-indigo-900 border border-indigo-800/60 transition-all"
+                  title="Сонсох"
                 >
                   <Volume2 className="w-4 h-4" />
                 </button>
@@ -377,7 +385,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
             className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-98 transition-all animate-pulse-glow"
           >
             <Sparkles className="w-5 h-5 text-amber-300" />
-            1-Minuten Quest abschließen! (+100 XP)
+            1 минутын даалгавар дуусгах! (+100 XP)
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

@@ -14,6 +14,7 @@ import {
   isCompletedToday,
   updateOnboarding,
   syncWithCloud,
+  getTodayDateString,
 } from './services/storage';
 import { ProfileId, SquadState } from './types';
 
@@ -21,6 +22,18 @@ export const App: React.FC = () => {
   const [squadState, setSquadState] = useState<SquadState>(() => loadSquadState());
   const [activeTab, setActiveTab] = useState<'chat' | 'squad' | 'archive'>('chat');
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [currentDateStr, setCurrentDateStr] = useState<string>(() => getTodayDateString());
+
+  // Check midnight rollover so the lock screen automatically unlocks next day's mission
+  useEffect(() => {
+    const dayCheck = setInterval(() => {
+      const today = getTodayDateString();
+      if (today !== currentDateStr) {
+        setCurrentDateStr(today);
+      }
+    }, 5000);
+    return () => clearInterval(dayCheck);
+  }, [currentDateStr]);
 
   const activeProfile = squadState.activeProfileId;
   const config = PROFILES[activeProfile];

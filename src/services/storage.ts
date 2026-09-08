@@ -157,6 +157,33 @@ export function updateCustomName(state: SquadState, profileId: ProfileId, newNam
   return updated;
 }
 
+export function getCalendarDayDifference(dateStr1: string, dateStr2: string): number {
+  try {
+    const [y1, m1, d1] = dateStr1.split('-').map(Number);
+    const [y2, m2, d2] = dateStr2.split('-').map(Number);
+    // Use UTC to prevent any daylight saving time / timezone shifts
+    const utc1 = Date.UTC(y1, m1 - 1, d1);
+    const utc2 = Date.UTC(y2, m2 - 1, d2);
+    return Math.round(Math.abs(utc2 - utc1) / (1000 * 60 * 60 * 24));
+  } catch {
+    return 1;
+  }
+}
+
+export function formatDialogueText(
+  text: string,
+  defaultUserName: string,
+  currentUserName: string,
+  defaultPartnerName: string,
+  currentPartnerName: string
+): string {
+  if (!text) return text;
+  const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text
+    .replace(new RegExp(escapeRegex(defaultUserName), 'g'), currentUserName)
+    .replace(new RegExp(escapeRegex(defaultPartnerName), 'g'), currentPartnerName);
+}
+
 export function isCompletedToday(progress: SiblingProgress, testModeUnlocked: boolean): boolean {
   if (testModeUnlocked) return false;
   if (!progress.lastCompletedDate) return false;
@@ -167,12 +194,9 @@ export function completeDayLesson(state: SquadState, profileId: ProfileId, day: 
   const today = getTodayDateString();
   const profile = state.profiles[profileId];
 
-  let newStreak = profile.streak;
+  let newStreak = profile.streak || 0;
   if (profile.lastCompletedDate) {
-    const lastDate = new Date(profile.lastCompletedDate);
-    const currentDate = new Date(today);
-    const diffTime = Math.abs(currentDate.getTime() - lastDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = getCalendarDayDifference(profile.lastCompletedDate, today);
 
     if (diffDays === 1) {
       newStreak += 1;
@@ -185,16 +209,18 @@ export function completeDayLesson(state: SquadState, profileId: ProfileId, day: 
     newStreak = 1;
   }
 
-  const completedDays = Array.from(new Set([...profile.completedDays, day]));
-  const xp = profile.xp + 100;
-  const badges = [...profile.badges];
+  const existingCompleted = Array.isArray(profile.completedDays) ? profile.completedDays : [];
+  const completedDays = Array.from(new Set([...existingCompleted, day]));
+  const xp = (profile.xp || 0) + 100;
+  const existingBadges = Array.isArray(profile.badges) ? profile.badges : [];
+  const badges = [...existingBadges];
   if (day === 10 && !badges.includes('Phase 1 Champion')) {
     badges.push('Phase 1 Champion');
   }
 
   const updatedProfile: SiblingProgress = {
     ...profile,
-    currentDay: Math.min(60, Math.max(profile.currentDay, day + 1)),
+    currentDay: Math.min(60, Math.max(profile.currentDay || 1, day + 1)),
     completedDays,
     streak: newStreak,
     lastCompletedDate: today,

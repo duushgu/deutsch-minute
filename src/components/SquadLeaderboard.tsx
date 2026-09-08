@@ -20,7 +20,7 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
   );
 
   const totalCompletedQuests = profileIds.reduce(
-    (acc, id) => acc + squadState.profiles[id].completedDays.length,
+    (acc, id) => acc + (squadState.profiles[id]?.completedDays?.length || 0),
     0
   );
 
@@ -32,10 +32,10 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
           <div>
             <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-indigo-400 font-bold">
               <Users className="w-4 h-4" />
-              Familien Squad Progress
+              Гэр бүлийн баг (Squad)
             </div>
             <h2 className="text-xl font-black text-white mt-1">
-              A1.1 Geschwister-Team
+              Герман хэлний баг
             </h2>
           </div>
           <div className="text-right">
@@ -43,7 +43,7 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
               {totalCompletedQuests}
             </div>
             <div className="text-[10px] text-slate-400 font-medium">
-              Quests gemeistert
+              Дууссан хичээл
             </div>
           </div>
         </div>
@@ -55,17 +55,17 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
               <Zap className="w-5 h-5 text-amber-400 fill-amber-400 animate-bounce" />
               <div>
                 <div className="text-xs font-black text-amber-300">
-                  ⚡ 3/3 TRIPLE COMBO AKTIV! ⚡
+                  ⚡ 3/3 TRIPLE COMBO ИДЭВХЖЛЭЭ! ⚡
                 </div>
                 <div className="text-[10px] text-slate-300">
-                  Alle 3 Geschwister haben heute gelernt! Großartige Disziplin!
+                  Бүгд өнөөдрийн 1 минутаа хийлээ! Багийн гайхалтай амжилт! 🔥
                 </div>
               </div>
             </div>
           ) : (
             <div className="text-xs text-slate-400 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              Wenn alle 3 heute 1 Min lernen, leuchtet der Triple-Combo Bonus auf!
+              Бүгдээрээ өдөрт 1 минут сурвал Triple-Combo идэвхжинэ! ⭐
             </div>
           )}
         </div>
@@ -119,12 +119,12 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                   {isDone ? (
                     <div className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-800/60">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      Erledigt
+                      Дууссан
                     </div>
                   ) : (
                     <div className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-full border border-slate-700">
                       <Clock className="w-3.5 h-3.5" />
-                      Wartet
+                      Хүлээгдэж байна
                     </div>
                   )}
                 </div>
@@ -133,22 +133,22 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
               {/* Stats Row */}
               <div className="mt-3 pt-3 border-t border-slate-800/80 grid grid-cols-3 gap-2 text-center">
                 <div className="bg-slate-950/50 p-2 rounded-xl border border-slate-800/60">
-                  <div className="text-[10px] text-slate-400">Streak</div>
+                  <div className="text-[10px] text-slate-400">Цуврал</div>
                   <div className="text-sm font-bold text-amber-400 flex items-center justify-center gap-1 font-mono">
                     <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                    {progress.streak} d
+                    {progress.streak} өдөр
                   </div>
                 </div>
 
                 <div className="bg-slate-950/50 p-2 rounded-xl border border-slate-800/60">
-                  <div className="text-[10px] text-slate-400">Fortschritt</div>
+                  <div className="text-[10px] text-slate-400">Өдөр</div>
                   <div className="text-sm font-bold text-indigo-300 font-mono">
-                    Tag {progress.currentDay}/60
+                    {progress.currentDay}/60
                   </div>
                 </div>
 
                 <div className="bg-slate-950/50 p-2 rounded-xl border border-slate-800/60">
-                  <div className="text-[10px] text-slate-400">Gesamt XP</div>
+                  <div className="text-[10px] text-slate-400">Нийт оноо</div>
                   <div className="text-sm font-bold text-purple-300 font-mono">
                     {progress.xp} XP
                   </div>
@@ -161,7 +161,7 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                   onClick={() => onSelectProfile(id)}
                   className="w-full mt-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all active:scale-98"
                 >
-                  Zu {progress.name || config.name} wechseln
+                  {progress.name || config.name} рүү шилжих
                 </button>
               )}
             </div>
