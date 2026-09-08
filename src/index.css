@@ -20,6 +20,15 @@
   --border-glow: #e879f9;
 }
 
+/* Catppuccin Macchiato */
+.theme-catppuccin {
+  --primary-glow: #c6a0f6;
+  --accent-color: #f5a97f;
+  --bubble-partner: rgba(54, 58, 79, 0.85);
+  --bubble-user: rgba(73, 77, 100, 0.85);
+  --border-glow: #b7bdf8;
+}
+
 .theme-gamer {
   --primary-glow: #06b6d4;
   --accent-color: #10b981;
@@ -28,13 +37,50 @@
   --border-glow: #22d3ee;
 }
 
-/* Demon Slayer & My Hero Academia Emerald Hero Palette */
+/* MLBB x Jujutsu Kaisen */
+.theme-mlbb_jjk {
+  --primary-glow: #a855f7;
+  --accent-color: #6366f1;
+  --bubble-partner: rgba(36, 17, 61, 0.85);
+  --bubble-user: rgba(51, 16, 82, 0.85);
+  --border-glow: #c084fc;
+}
+
+/* MLBB x Transformers */
+.theme-mlbb_transformers {
+  --primary-glow: #eab308;
+  --accent-color: #3b82f6;
+  --bubble-partner: rgba(22, 34, 54, 0.85);
+  --bubble-user: rgba(29, 47, 77, 0.85);
+  --border-glow: #facc15;
+}
+
+/* Demon Slayer: Tanjiro Water & Sun Breathing */
+.theme-tanjiro,
 .theme-cozy {
   --primary-glow: #10b981;
-  --accent-color: #f59e0b;
+  --accent-color: #06b6d4;
   --bubble-partner: rgba(6, 78, 59, 0.85);
   --bubble-user: rgba(6, 95, 70, 0.85);
   --border-glow: #34d399;
+}
+
+/* Demon Slayer: Rengoku Fire Hashira */
+.theme-rengoku {
+  --primary-glow: #f97316;
+  --accent-color: #ef4444;
+  --bubble-partner: rgba(69, 18, 12, 0.85);
+  --bubble-user: rgba(98, 26, 15, 0.85);
+  --border-glow: #fbbf24;
+}
+
+/* My Hero Academia: Deku One For All */
+.theme-mha_deku {
+  --primary-glow: #10b981;
+  --accent-color: #14b8a6;
+  --bubble-partner: rgba(4, 52, 43, 0.85);
+  --bubble-user: rgba(6, 78, 62, 0.85);
+  --border-glow: #2dd4bf;
 }
 
 /* Clean standard theme (default dark mode, minimal distraction) */
@@ -205,4 +251,146 @@
 
 .animate-hero-spark {
   animation: hero-spark-glow 2.5s infinite ease-in-out;
+}
+
+/* 5. Rengoku Flame Embers rising */
+.flame-ember {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: #f97316;
+  box-shadow: 0 0 10px #ef4444, 0 0 16px #f59e0b;
+  opacity: 0;
+  animation: ember-rise 3.8s infinite linear;
+}
+.ember-1 { left: 12%; animation-duration: 3.2s; animation-delay: 0.1s; }
+.ember-2 { left: 28%; animation-duration: 4.1s; animation-delay: 1.2s; width: 6px; height: 6px; background-color: #ef4444; }
+.ember-3 { left: 48%; animation-duration: 3.6s; animation-delay: 0.5s; }
+.ember-4 { left: 68%; animation-duration: 4.4s; animation-delay: 1.8s; width: 5px; height: 5px; background-color: #fbbf24; }
+.ember-5 { left: 82%; animation-duration: 3.4s; animation-delay: 0.9s; }
+.ember-6 { left: 92%; animation-duration: 4.8s; animation-delay: 2.3s; }
+
+@keyframes ember-rise {
+  0% {
+    bottom: -10px;
+    opacity: 0;
+    transform: translateX(0) scale(0.5);
+  }
+  20% {
+    opacity: 0.95;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    bottom: 105%;
+    opacity: 0;
+    transform: translateX(-20px) scale(1.3);
+  }
+}
+
+/* 6. Jujutsu Kaisen Cursed Energy Sparks */
+.cursed-spark {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background-color: #c084fc;
+  box-shadow: 0 0 12px #9333ea, 0 0 20px #6366f1;
+  opacity: 0;
+  animation: cursed-drift 4.2s infinite ease-in-out;
+}
+.cursed-1 { left: 18%; animation-duration: 3.8s; animation-delay: 0.3s; }
+.cursed-2 { left: 38%; animation-duration: 4.5s; animation-delay: 1.4s; width: 7px; height: 7px; }
+.cursed-3 { left: 62%; animation-duration: 3.9s; animation-delay: 0.7s; }
+.cursed-4 { left: 80%; animation-duration: 4.8s; animation-delay: 2.1s; width: 4px; height: 4px; }
+
+@keyframes cursed-drift {
+  0% {
+    bottom: -10px;
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  25% {
+    opacity: 0.9;
+    transform: translateY(-20px) scale(1.1);
+  }
+  75% {
+    opacity: 0.8;
+    transform: translateY(-80px) scale(0.9);
+  }
+  100% {
+    bottom: 105%;
+    opacity: 0;
+    transform: translateY(-120px) scale(1.3);
+  }
+}
+
+/* 7. Catppuccin Macchiato gentle stars */
+.catppuccin-star {
+  position: absolute;
+  top: -20px;
+  font-size: 13px;
+  opacity: 0;
+  animation: catppuccin-float 8s infinite ease-in-out;
+  filter: drop-shadow(0 0 6px rgba(198, 160, 246, 0.5));
+}
+.star-1 { left: 14%; animation-duration: 7.5s; animation-delay: 0.2s; font-size: 14px; }
+.star-2 { left: 36%; animation-duration: 9s; animation-delay: 2.2s; font-size: 12px; }
+.star-3 { left: 58%; animation-duration: 8s; animation-delay: 1.1s; font-size: 15px; }
+.star-4 { left: 78%; animation-duration: 8.5s; animation-delay: 3s; font-size: 13px; }
+.star-5 { left: 90%; animation-duration: 7s; animation-delay: 1.7s; font-size: 11px; }
+
+@keyframes catppuccin-float {
+  0% {
+    top: -20px;
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  20% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    top: 105%;
+    opacity: 0;
+    transform: translateY(20px) rotate(180deg);
+  }
+}
+
+/* 8. Transformers Energon & Welding Sparks */
+.mecha-spark {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background-color: #facc15;
+  box-shadow: 0 0 8px #eab308, 0 0 14px #3b82f6;
+  opacity: 0;
+  animation: mecha-pulse 3.5s infinite linear;
+}
+.mecha-1 { left: 20%; animation-duration: 3s; animation-delay: 0.2s; }
+.mecha-2 { left: 45%; animation-duration: 4s; animation-delay: 1.6s; width: 4px; height: 4px; background-color: #38bdf8; }
+.mecha-3 { left: 70%; animation-duration: 3.2s; animation-delay: 0.8s; }
+.mecha-4 { left: 85%; animation-duration: 3.8s; animation-delay: 2.2s; }
+
+@keyframes mecha-pulse {
+  0% {
+    bottom: -5px;
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  25% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    bottom: 105%;
+    opacity: 0;
+    transform: scale(1.2);
+  }
 }

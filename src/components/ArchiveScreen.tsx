@@ -31,30 +31,58 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
   const partnerName = progress.partnerName || config.partnerName;
 
   const isKdrama = config.theme === 'kdrama';
+  const isCatppuccin = config.theme === 'catppuccin';
   const isGamer = config.theme === 'gamer';
-  const isCozy = config.theme === 'cozy';
+  const isJjk = config.theme === 'mlbb_jjk';
+  const isTransformers = config.theme === 'mlbb_transformers';
+  const isRengoku = config.theme === 'rengoku';
+  const isGreenHero = config.theme === 'cozy' || config.theme === 'tanjiro' || config.theme === 'mha_deku';
 
   const headerClass = isKdrama
     ? 'bg-[#180b26]/85 border-pink-900/40 shadow-pink-950/20'
+    : isCatppuccin
+    ? 'bg-[#1e2030]/85 border-[#c6a0f6]/30 shadow-purple-950/20'
     : isGamer
     ? 'bg-[#040e1f]/85 border-cyan-900/40 shadow-cyan-950/20'
-    : isCozy
+    : isJjk
+    ? 'bg-[#0f071e]/85 border-purple-900/40 shadow-purple-950/20'
+    : isTransformers
+    ? 'bg-[#0a1222]/85 border-yellow-900/40 shadow-yellow-950/20'
+    : isRengoku
+    ? 'bg-[#1e0703]/85 border-orange-900/40 shadow-orange-950/20'
+    : isGreenHero
     ? 'bg-[#021812]/85 border-emerald-900/40 shadow-emerald-950/20'
     : 'bg-slate-900/85 border-slate-800 shadow-slate-950/20';
 
   const completedCardClass = isKdrama
     ? 'bg-[#1b0d2d]/80 border-pink-900/50'
+    : isCatppuccin
+    ? 'bg-[#24273a]/80 border-[#494d64]'
     : isGamer
     ? 'bg-[#051428]/80 border-cyan-900/50'
-    : isCozy
+    : isJjk
+    ? 'bg-[#140a28]/80 border-purple-900/50'
+    : isTransformers
+    ? 'bg-[#0d162a]/80 border-yellow-900/50'
+    : isRengoku
+    ? 'bg-[#240a05]/80 border-orange-900/50'
+    : isGreenHero
     ? 'bg-[#032017]/80 border-emerald-900/50'
     : 'bg-slate-900/80 border-slate-800';
 
   const currentCardClass = isKdrama
     ? 'bg-[#260f3a]/90 border-pink-500/60 shadow-md shadow-pink-500/20'
+    : isCatppuccin
+    ? 'bg-[#363a4f]/90 border-[#c6a0f6]/60 shadow-md shadow-[#c6a0f6]/20'
     : isGamer
     ? 'bg-[#061b34]/90 border-cyan-500/60 shadow-md shadow-cyan-500/20'
-    : isCozy
+    : isJjk
+    ? 'bg-[#1c0e36]/90 border-purple-500/60 shadow-md shadow-purple-500/20'
+    : isTransformers
+    ? 'bg-[#111e38]/90 border-yellow-500/60 shadow-md shadow-yellow-500/20'
+    : isRengoku
+    ? 'bg-[#330f07]/90 border-orange-500/60 shadow-md shadow-orange-500/20'
+    : isGreenHero
     ? 'bg-[#04291f]/90 border-emerald-500/60 shadow-md shadow-emerald-500/20'
     : 'bg-slate-900/90 border-indigo-500/60 shadow-md shadow-indigo-500/20';
 

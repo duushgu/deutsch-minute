@@ -27,11 +27,19 @@ const PROFILE_THEMES: Record<
   sister: [
     {
       id: 'kdrama',
-      title: 'K-Drama & Twilight (Тусгай)',
+      title: 'K-Drama Twilight',
       icon: '🌸',
       dotClass: 'bg-pink-400 border-pink-300 shadow-[0_0_8px_#ec4899]',
       selectedBorderClass: 'border-pink-500/80 shadow-pink-500/20',
       selectedBgClass: 'bg-pink-950/60',
+    },
+    {
+      id: 'catppuccin',
+      title: 'Catppuccin Macchiato',
+      icon: '☕',
+      dotClass: 'bg-[#c6a0f6] border-[#b7bdf8] shadow-[0_0_8px_#c6a0f6]',
+      selectedBorderClass: 'border-[#c6a0f6]/80 shadow-[#c6a0f6]/20',
+      selectedBgClass: 'bg-[#24273a]',
     },
     {
       id: 'standard',
@@ -45,11 +53,27 @@ const PROFILE_THEMES: Record<
   brother1: [
     {
       id: 'gamer',
-      title: 'Mobile Legends Arena (Тусгай)',
+      title: 'MLBB: Cyber Arena',
       icon: '⚡',
       dotClass: 'bg-cyan-400 border-cyan-300 shadow-[0_0_8px_#06b6d4]',
       selectedBorderClass: 'border-cyan-500/80 shadow-cyan-500/20',
       selectedBgClass: 'bg-cyan-950/60',
+    },
+    {
+      id: 'mlbb_jjk',
+      title: 'MLBB x Jujutsu Kaisen',
+      icon: '🤞',
+      dotClass: 'bg-purple-400 border-purple-300 shadow-[0_0_8px_#a855f7]',
+      selectedBorderClass: 'border-purple-500/80 shadow-purple-500/20',
+      selectedBgClass: 'bg-purple-950/60',
+    },
+    {
+      id: 'mlbb_transformers',
+      title: 'MLBB x Transformers',
+      icon: '🤖',
+      dotClass: 'bg-yellow-400 border-yellow-300 shadow-[0_0_8px_#eab308]',
+      selectedBorderClass: 'border-yellow-500/80 shadow-yellow-500/20',
+      selectedBgClass: 'bg-yellow-950/60',
     },
     {
       id: 'standard',
@@ -62,12 +86,28 @@ const PROFILE_THEMES: Record<
   ],
   brother2: [
     {
-      id: 'cozy',
-      title: 'Demon Slayer & MHA (Тусгай)',
-      icon: '🛡️',
+      id: 'tanjiro',
+      title: 'Demon Slayer: Tanjiro',
+      icon: '🌊',
       dotClass: 'bg-emerald-400 border-emerald-300 shadow-[0_0_8px_#10b981]',
       selectedBorderClass: 'border-emerald-500/80 shadow-emerald-500/20',
       selectedBgClass: 'bg-emerald-950/60',
+    },
+    {
+      id: 'rengoku',
+      title: 'Demon Slayer: Fire Hashira',
+      icon: '🔥',
+      dotClass: 'bg-orange-500 border-amber-300 shadow-[0_0_8px_#f97316]',
+      selectedBorderClass: 'border-orange-500/80 shadow-orange-500/20',
+      selectedBgClass: 'bg-orange-950/60',
+    },
+    {
+      id: 'mha_deku',
+      title: 'My Hero Academia: Deku',
+      icon: '⚡',
+      dotClass: 'bg-teal-400 border-teal-300 shadow-[0_0_8px_#14b8a6]',
+      selectedBorderClass: 'border-teal-500/80 shadow-teal-500/20',
+      selectedBgClass: 'bg-teal-950/60',
     },
     {
       id: 'standard',
@@ -365,7 +405,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <div className="space-y-1.5 pt-0.5">
             {availableThemes.map((t) => {
-              const isSelected = effectiveTheme === t.id;
+              const isSelected =
+                effectiveTheme === t.id || (t.id === 'tanjiro' && effectiveTheme === 'cozy');
               return (
                 <button
                   key={t.id}

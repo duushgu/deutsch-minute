@@ -166,46 +166,90 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   };
 
   const isKdrama = config.theme === 'kdrama';
+  const isCatppuccin = config.theme === 'catppuccin';
   const isGamer = config.theme === 'gamer';
-  const isCozy = config.theme === 'cozy';
+  const isJjk = config.theme === 'mlbb_jjk';
+  const isTransformers = config.theme === 'mlbb_transformers';
+  const isRengoku = config.theme === 'rengoku';
+  const isGreenHero = config.theme === 'cozy' || config.theme === 'tanjiro' || config.theme === 'mha_deku';
 
   const avatarBorderClass = isKdrama
     ? 'bg-pink-950/80 border-pink-500/40'
+    : isCatppuccin
+    ? 'bg-[#24273a] border-[#c6a0f6]/50'
     : isGamer
     ? 'bg-cyan-950/80 border-cyan-500/40'
-    : isCozy
+    : isJjk
+    ? 'bg-purple-950/80 border-purple-500/40'
+    : isTransformers
+    ? 'bg-yellow-950/80 border-yellow-500/40'
+    : isRengoku
+    ? 'bg-orange-950/80 border-orange-500/40'
+    : isGreenHero
     ? 'bg-emerald-950/80 border-emerald-500/40'
     : 'bg-slate-900 border-slate-700';
 
   const timerCardClass = isKdrama
     ? 'bg-[#180b26]/80 border-pink-900/50 shadow-pink-950/20'
+    : isCatppuccin
+    ? 'bg-[#1e2030]/85 border-[#c6a0f6]/30 shadow-purple-950/20'
     : isGamer
     ? 'bg-[#040c1b]/85 border-cyan-900/50 shadow-cyan-950/20'
-    : isCozy
+    : isJjk
+    ? 'bg-[#0f071e]/85 border-purple-900/50 shadow-purple-950/20'
+    : isTransformers
+    ? 'bg-[#0a1222]/85 border-yellow-900/50 shadow-yellow-950/20'
+    : isRengoku
+    ? 'bg-[#1e0703]/85 border-orange-900/50 shadow-orange-950/20'
+    : isGreenHero
     ? 'bg-[#031d15]/85 border-emerald-900/50 shadow-emerald-950/20'
     : 'bg-slate-900/85 border-slate-800 shadow-slate-950/20';
 
   const partnerBubbleClass = isKdrama
     ? 'bg-[#1e0d2e]/85 border-pink-500/30 shadow-pink-950/20'
+    : isCatppuccin
+    ? 'bg-[#24273a]/90 border-[#c6a0f6]/30 shadow-purple-950/20'
     : isGamer
     ? 'bg-[#06172a]/85 border-cyan-500/30 shadow-cyan-950/20'
-    : isCozy
+    : isJjk
+    ? 'bg-[#160a2b]/85 border-purple-500/30 shadow-purple-950/20'
+    : isTransformers
+    ? 'bg-[#0d162a]/85 border-yellow-500/30 shadow-yellow-950/20'
+    : isRengoku
+    ? 'bg-[#250a05]/85 border-orange-500/30 shadow-orange-950/20'
+    : isGreenHero
     ? 'bg-[#05281e]/85 border-emerald-500/40 shadow-emerald-950/20'
     : 'bg-slate-800/85 border-slate-700/60 shadow-slate-950/20';
 
   const userBubbleClass = isKdrama
     ? 'bg-[#29103c]/90 border-pink-500/40 shadow-pink-500/10'
+    : isCatppuccin
+    ? 'bg-[#363a4f]/90 border-[#b7bdf8]/50 shadow-[#c6a0f6]/10'
     : isGamer
     ? 'bg-[#08223d]/90 border-cyan-500/50 shadow-cyan-500/15'
-    : isCozy
+    : isJjk
+    ? 'bg-[#220d3d]/90 border-purple-500/50 shadow-purple-500/15'
+    : isTransformers
+    ? 'bg-[#121c35]/90 border-yellow-500/50 shadow-yellow-500/15'
+    : isRengoku
+    ? 'bg-[#340e06]/90 border-orange-500/50 shadow-orange-500/15'
+    : isGreenHero
     ? 'bg-[#063828]/90 border-emerald-400/50 shadow-emerald-500/15'
     : 'bg-indigo-950/90 border-indigo-500/40 shadow-indigo-500/10';
 
   const actionBtnClass = isKdrama
     ? 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white shadow-pink-500/30'
+    : isCatppuccin
+    ? 'bg-gradient-to-r from-[#c6a0f6] to-[#b7bdf8] text-[#181926] font-black hover:opacity-95 shadow-[#c6a0f6]/40'
     : isGamer
     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-cyan-500/30'
-    : isCozy
+    : isJjk
+    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-500/30'
+    : isTransformers
+    ? 'bg-gradient-to-r from-yellow-500 to-blue-600 hover:from-yellow-400 hover:to-blue-500 text-white shadow-yellow-500/30'
+    : isRengoku
+    ? 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white shadow-orange-500/30'
+    : isGreenHero
     ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/30'
     : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-indigo-500/30';
 

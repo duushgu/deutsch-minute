@@ -22,27 +22,51 @@ export const Navbar: React.FC<NavbarProps> = ({
   const headerBgClass =
     config.theme === 'kdrama'
       ? 'bg-[#13081e]/80 border-pink-900/40 shadow-lg shadow-pink-950/20'
+      : config.theme === 'catppuccin'
+      ? 'bg-[#1e2030]/85 border-[#c6a0f6]/30 shadow-lg shadow-purple-950/20'
       : config.theme === 'gamer'
       ? 'bg-[#030914]/85 border-cyan-900/40 shadow-lg shadow-cyan-950/20'
-      : config.theme === 'cozy'
+      : config.theme === 'mlbb_jjk'
+      ? 'bg-[#0e061c]/85 border-purple-900/40 shadow-lg shadow-purple-950/20'
+      : config.theme === 'mlbb_transformers'
+      ? 'bg-[#0b1220]/85 border-yellow-900/40 shadow-lg shadow-yellow-950/20'
+      : config.theme === 'rengoku'
+      ? 'bg-[#1c0804]/85 border-orange-900/40 shadow-lg shadow-orange-950/20'
+      : (config.theme === 'cozy' || config.theme === 'tanjiro' || config.theme === 'mha_deku')
       ? 'bg-[#021610]/85 border-emerald-900/40 shadow-lg shadow-emerald-950/20'
       : 'bg-slate-950/85 border-slate-800 shadow-lg shadow-black/20';
 
   const avatarBgClass =
     config.theme === 'kdrama'
       ? 'bg-pink-600/20 border-pink-500/40 text-pink-200'
+      : config.theme === 'catppuccin'
+      ? 'bg-[#c6a0f6]/20 border-[#c6a0f6]/40 text-[#c6a0f6]'
       : config.theme === 'gamer'
       ? 'bg-cyan-600/20 border-cyan-500/40 text-cyan-200'
-      : config.theme === 'cozy'
+      : config.theme === 'mlbb_jjk'
+      ? 'bg-purple-600/20 border-purple-500/40 text-purple-200'
+      : config.theme === 'mlbb_transformers'
+      ? 'bg-yellow-600/20 border-yellow-500/40 text-yellow-200'
+      : config.theme === 'rengoku'
+      ? 'bg-orange-600/20 border-orange-500/40 text-orange-200'
+      : (config.theme === 'cozy' || config.theme === 'tanjiro' || config.theme === 'mha_deku')
       ? 'bg-emerald-600/20 border-emerald-500/40 text-emerald-200'
       : 'bg-indigo-600/20 border-indigo-500/40 text-indigo-200';
 
   const tabActiveClass =
     config.theme === 'kdrama'
       ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-md shadow-pink-600/40'
+      : config.theme === 'catppuccin'
+      ? 'bg-gradient-to-r from-[#c6a0f6] to-[#b7bdf8] text-[#181926] font-black shadow-md shadow-[#c6a0f6]/40'
       : config.theme === 'gamer'
       ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/40'
-      : config.theme === 'cozy'
+      : config.theme === 'mlbb_jjk'
+      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/40'
+      : config.theme === 'mlbb_transformers'
+      ? 'bg-gradient-to-r from-yellow-500 to-blue-600 text-white shadow-md shadow-yellow-500/40'
+      : config.theme === 'rengoku'
+      ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-md shadow-orange-600/40'
+      : (config.theme === 'cozy' || config.theme === 'tanjiro' || config.theme === 'mha_deku')
       ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/40'
       : 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-600/40';
 

@@ -57,7 +57,17 @@ export interface DayLesson {
   keyVocab: KeyVocab[];
 }
 
-export type ThemeId = 'kdrama' | 'gamer' | 'cozy' | 'standard';
+export type ThemeId =
+  | 'kdrama'
+  | 'catppuccin'
+  | 'gamer'
+  | 'mlbb_jjk'
+  | 'mlbb_transformers'
+  | 'cozy'
+  | 'tanjiro'
+  | 'rengoku'
+  | 'mha_deku'
+  | 'standard';
 
 export interface SiblingProgress {
   profileId: ProfileId;

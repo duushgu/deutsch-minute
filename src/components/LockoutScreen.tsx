@@ -60,30 +60,58 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
   const isfjHeroRank = getIsfjHeroRank(completedCount, partnerName);
 
   const isKdrama = config.theme === 'kdrama';
+  const isCatppuccin = config.theme === 'catppuccin';
   const isGamer = config.theme === 'gamer';
-  const isCozy = config.theme === 'cozy';
+  const isJjk = config.theme === 'mlbb_jjk';
+  const isTransformers = config.theme === 'mlbb_transformers';
+  const isRengoku = config.theme === 'rengoku';
+  const isGreenHero = config.theme === 'cozy' || config.theme === 'tanjiro' || config.theme === 'mha_deku';
 
   const lockoutHeaderClass = isKdrama
     ? 'bg-gradient-to-b from-[#1c0d2e]/90 to-[#2f1345]/70 border-pink-500/40 shadow-pink-950/30'
+    : isCatppuccin
+    ? 'bg-gradient-to-b from-[#1e2030]/90 to-[#24273a]/80 border-[#c6a0f6]/40 shadow-purple-950/30'
     : isGamer
     ? 'bg-gradient-to-b from-[#051329]/90 to-[#022a45]/70 border-cyan-500/40 shadow-cyan-950/30'
-    : isCozy
+    : isJjk
+    ? 'bg-gradient-to-b from-[#0e061c]/90 to-[#240a45]/70 border-purple-500/40 shadow-purple-950/30'
+    : isTransformers
+    ? 'bg-gradient-to-b from-[#0b1220]/90 to-[#1e2c45]/70 border-yellow-500/40 shadow-yellow-950/30'
+    : isRengoku
+    ? 'bg-gradient-to-b from-[#210703]/90 to-[#3b1206]/70 border-orange-500/40 shadow-orange-950/30'
+    : isGreenHero
     ? 'bg-gradient-to-b from-[#04241b]/90 to-[#033b28]/70 border-emerald-500/40 shadow-emerald-950/30'
     : 'bg-gradient-to-b from-slate-900/90 to-slate-950/70 border-slate-700/60 shadow-slate-950/30';
 
   const cardBaseClass = isKdrama
     ? 'bg-[#150924]/80 border-pink-900/40 shadow-pink-950/20'
+    : isCatppuccin
+    ? 'bg-[#24273a]/80 border-[#494d64]/60 shadow-purple-950/20'
     : isGamer
     ? 'bg-[#030e1f]/80 border-cyan-900/40 shadow-cyan-950/20'
-    : isCozy
+    : isJjk
+    ? 'bg-[#120824]/80 border-purple-900/40 shadow-purple-950/20'
+    : isTransformers
+    ? 'bg-[#0a1222]/80 border-yellow-900/40 shadow-yellow-950/20'
+    : isRengoku
+    ? 'bg-[#1f0904]/80 border-orange-900/40 shadow-orange-950/20'
+    : isGreenHero
     ? 'bg-[#021812]/80 border-emerald-900/40 shadow-emerald-950/20'
     : 'bg-slate-900/80 border-slate-800 shadow-slate-950/20';
 
   const rowBaseClass = isKdrama
     ? 'bg-[#220d36]/70 border-pink-950/60'
+    : isCatppuccin
+    ? 'bg-[#363a4f]/70 border-[#494d64]/60'
     : isGamer
     ? 'bg-[#061830]/70 border-cyan-950/60'
-    : isCozy
+    : isJjk
+    ? 'bg-[#1b0c36]/70 border-purple-950/60'
+    : isTransformers
+    ? 'bg-[#121c32]/70 border-yellow-950/60'
+    : isRengoku
+    ? 'bg-[#2d0f07]/70 border-orange-950/60'
+    : isGreenHero
     ? 'bg-[#04291f]/70 border-emerald-950/60'
     : 'bg-slate-900/70 border-slate-800';
 
