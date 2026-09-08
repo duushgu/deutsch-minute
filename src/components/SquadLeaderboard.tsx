@@ -73,17 +73,11 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                       <span className="text-base font-bold text-white">
                         {progress.name || config.name}
                       </span>
-                      <span className="text-sm">
-                        {progress.partnerAvatar || config.partnerAvatar}
-                      </span>
                       {isCurrentActive && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold border border-emerald-800/60">
                           Чи
                         </span>
                       )}
-                    </div>
-                    <div className="text-xs text-slate-400">
-                      {config.title}
                     </div>
                   </div>
                 </div>
