@@ -8,12 +8,14 @@ import { soundFX } from '../services/soundEffects';
 interface ChatSessionProps {
   lesson: DayLesson;
   config: ProfileConfig;
+  userName: string;
   onComplete: (day: number) => void;
 }
 
 export const ChatSession: React.FC<ChatSessionProps> = ({
   lesson,
   config,
+  userName,
   onComplete,
 }) => {
   // Stage in the 1-minute flow:
@@ -32,6 +34,11 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   const turn2 = lesson.dialogue[1]; // User challenge
   const turn3 = lesson.dialogue[2]; // Partner close
 
+  const formatText = (text: string) => {
+    if (!text) return text;
+    return text.replace(new RegExp(config.name, 'g'), userName);
+  };
+
   // Timer: counts up to 60 seconds
   useEffect(() => {
     const timer = setInterval(() => {
@@ -43,10 +50,13 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   // Initialize words for word-order challenge
   useEffect(() => {
     if (turn2?.challenge?.type === 'word_order' && turn2.challenge.scrambledWords) {
-      setAvailableWords([...turn2.challenge.scrambledWords]);
+      const formattedWords = turn2.challenge.scrambledWords.map((w) =>
+        w.replace(config.name, userName)
+      );
+      setAvailableWords([...formattedWords]);
       setSelectedWords([]);
     }
-  }, [turn2]);
+  }, [turn2, userName, config.name]);
 
   // Autoplay partner message on first load
   useEffect(() => {
@@ -78,7 +88,9 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   };
 
   const handleCheckWordOrder = () => {
-    const targetOrder = turn2.challenge?.correctOrder || [];
+    const targetOrder = (turn2.challenge?.correctOrder || []).map((w) =>
+      w.replace(config.name, userName)
+    );
     const isMatch =
       selectedWords.length === targetOrder.length &&
       selectedWords.every((w, i) => w === targetOrder[i]);
@@ -171,15 +183,15 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
             </div>
             {/* German Text */}
             <p className="text-base font-semibold text-white tracking-wide">
-              {turn1.textDe}
+              {formatText(turn1.textDe)}
             </p>
             {/* Mongolian Cyrillic Phonetics */}
             <div className="mt-1.5 inline-block px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-800/40 text-indigo-200 text-xs font-mono">
-              {turn1.phoneticMn}
+              {formatText(turn1.phoneticMn)}
             </div>
             {/* Mongolian Translation */}
             <p className="mt-1.5 text-xs text-slate-400">
-              {turn1.textMn}
+              {formatText(turn1.textMn)}
             </p>
           </div>
         </div>
@@ -193,7 +205,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
             <div className="flex-1 bg-slate-900/90 border border-indigo-900/50 rounded-2xl rounded-tr-sm p-3.5 shadow-md">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-indigo-300">
-                  Du ({config.name})
+                  Du ({userName})
                 </span>
                 {currentStep >= 2 && (
                   <button
@@ -210,13 +222,13 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                 <div>
                   <p className="text-base font-semibold text-emerald-400 tracking-wide flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    {turn2.textDe}
+                    {formatText(turn2.textDe)}
                   </p>
                   <div className="mt-1.5 inline-block px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-emerald-300 text-xs font-mono">
-                    {turn2.phoneticMn}
+                    {formatText(turn2.phoneticMn)}
                   </div>
                   <p className="mt-1 text-xs text-slate-400">
-                    {turn2.textMn}
+                    {formatText(turn2.textMn)}
                   </p>
                 </div>
               ) : (
@@ -338,13 +350,13 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                 </button>
               </div>
               <p className="text-base font-semibold text-white tracking-wide">
-                {turn3.textDe}
+                {formatText(turn3.textDe)}
               </p>
               <div className="mt-1.5 inline-block px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-800/40 text-indigo-200 text-xs font-mono">
-                {turn3.phoneticMn}
+                {formatText(turn3.phoneticMn)}
               </div>
               <p className="mt-1.5 text-xs text-slate-400">
-                {turn3.textMn}
+                {formatText(turn3.textMn)}
               </p>
             </div>
           </div>

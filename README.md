@@ -30,6 +30,14 @@ Alle 3 Geschwister lernen denselben A1.1-Kernwortschatz, aber das Thema, die Cha
 | **Temuulen** | **ISTP** | 13 | ⚡ Cyber Gamer HUD | Saber (Squad Leader) | Mobile Legends, Ranked Matches, Taktik, High-Speed |
 | **Batu** | **ISFJ** | 13 | 🛡️ Warm Anime / Shōnen | Tanjiro (Trainingspartner) | Demon Slayer Vibes, Teamgeist, Familie, gegenseitiger Schutz |
 
+### 🚀 Die 3 personalisierten Direkt-Links:
+Schicke jedem Geschwisterkind einfach seinen eigenen Direkt-Link:
+- 🌸 **Anu:** `https://duushgu.github.io/deutsch-minute/?p=anu`
+- ⚡ **Temuulen:** `https://duushgu.github.io/deutsch-minute/?p=temuulen`
+- 🛡️ **Batu:** `https://duushgu.github.io/deutsch-minute/?p=batu`
+
+*Beim ersten Öffnen fragt die App kurz nach dem Wunschnamen/Spitznamen und sperrt sich fest auf dieses Profil (keine verwirrende Profil-Auswahl auf dem Handy!). Auf dem Homescreen installiert sich die PWA mit dem persönlichen Namen (z.B. „Temuulen ⚡ Deutsch Minute“).*
+
 ---
 
 ## 3. A1.1 Curriculum-Phasen (60 Tage Masterplan)
@@ -43,19 +51,18 @@ Alle 3 Geschwister lernen denselben A1.1-Kernwortschatz, aber das Thema, die Cha
 
 ---
 
-## 4. Zero-Login Sync & Backup (Kein Account-Zwang)
+## 4. Zero-UI Silent Sync (Keine Passwörter, keine Codes)
 
-13–14-Jährige wollen keine E-Mail-Bestätigungen und Passwörter eingeben:
-1. **Lokal sofort spielbar:** Fortschritt speichert sich automatisch im Browser (`localStorage`).
+13–14-Jährige wollen keine E-Mail-Bestätigungen, Passwörter oder kryptische Codes:
+1. **Automatischer Hintergrund-Sync:** Fortschritt wird lokal und im Hintergrund gesichert. Die Kinder sehen nur ein beruhigendes `☁️ Sync`-Symbol.
 2. **Familien-Squad Übersicht:** Im Tab **Squad** sehen alle drei, wer heute schon seine 1-Minute erledigt hat. Wenn alle 3 fertig sind, leuchtet der **⚡ 3/3 TRIPLE COMBO BONUS** auf!
-3. **Backup / Handy-Wechsel:** In den Einstellungen (Zahnrad) gibt es den Button **„Backup-Code kopieren“**. Beim Handy-Wechsel einfach den Code auf dem neuen Gerät einfügen – der gesamte Stand aller Geschwister ist in 1 Sekunde wiederhergestellt.
-4. **Admin Schnelltest-Modus:** Der große Bruder kann in den Einstellungen den 24h-Lockout per Schalter ausschalten, um beliebige Tage sofort zu testen.
+3. **Admin Schnelltest-Modus:** Der große Bruder kann in den Einstellungen den 24h-Lockout per Schalter ausschalten, um beliebige Tage sofort zu testen.
 
 ---
 
 ## 5. PWA-Installation auf Android Handys
 
-1. Den GitHub-Pages-Link im mobilen **Google Chrome** öffnen.
+1. Den personalisierten Link (z.B. `?p=temuulen`) im mobilen **Google Chrome** öffnen.
 2. Auf das Drei-Punkte-Menü ⋮ tippen.
 3. Auf **„Zum Startbildschirm hinzufügen“** (oder *„App installieren“*) tippen.
 4. Fertig! Die App startet im Vollbildmodus ohne Browserleiste wie eine native Android-App und funktioniert dank Service Worker auch offline.

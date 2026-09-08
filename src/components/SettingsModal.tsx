@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, Volume2, VolumeX, Shield, Upload, Copy, Check, RefreshCw } from 'lucide-react';
+import { X, Volume2, VolumeX, Shield, RefreshCw, Cloud, Edit2, Check } from 'lucide-react';
 import { ProfileId, SquadState } from '../types';
 import { PROFILES } from '../data/profiles';
-import { exportStateString, importStateString } from '../services/storage';
 import { soundFX } from '../services/soundEffects';
+import { updateCustomName } from '../services/storage';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -18,8 +18,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   squadState,
   onUpdateSquadState,
 }) => {
-  const [importCode, setImportCode] = useState<string>('');
-  const [copied, setCopied] = useState<boolean>(false);
+  const activeId = squadState.activeProfileId;
+  const config = PROFILES[activeId];
+  const progress = squadState.profiles[activeId];
+
+  const [isEditingName, setIsEditingName] = useState<boolean>(false);
+  const [nameInput, setNameInput] = useState<string>(progress.name || config.name);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(soundFX.enabled);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -28,6 +32,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleToggleSound = () => {
     soundFX.enabled = !soundFX.enabled;
     setSoundEnabled(soundFX.enabled);
+  };
+
+  const handleSaveName = () => {
+    if (!nameInput.trim()) return;
+    const updated = updateCustomName(squadState, activeId, nameInput.trim());
+    onUpdateSquadState(updated);
+    setIsEditingName(false);
+    setMessage('Name erfolgreich geändert! ✅');
+    setTimeout(() => setMessage(null), 2500);
   };
 
   const handleSelectProfile = (id: ProfileId) => {
@@ -47,53 +60,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleResetToday = () => {
-    const active = squadState.activeProfileId;
-    const currentProfile = squadState.profiles[active];
     const updated: SquadState = {
       ...squadState,
       profiles: {
         ...squadState.profiles,
-        [active]: {
-          ...currentProfile,
+        [activeId]: {
+          ...progress,
           lastCompletedDate: null,
         },
       },
     };
     onUpdateSquadState(updated);
-    setMessage('Heutiger Status für ' + PROFILES[active].name + ' zurückgesetzt!');
-    setTimeout(() => setMessage(null), 3000);
-  };
-
-  const handleCopyBackup = () => {
-    const encoded = exportStateString(squadState);
-    navigator.clipboard.writeText(encoded);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-  };
-
-  const handleImportBackup = () => {
-    if (!importCode.trim()) return;
-    const restored = importStateString(importCode.trim());
-    if (restored) {
-      onUpdateSquadState(restored);
-      setMessage('Fortschritt erfolgreich wiederhergestellt! ✅');
-      setImportCode('');
-      setTimeout(() => setMessage(null), 3000);
-    } else {
-      setMessage('Fehler: Ungültiger Wiederherstellungscode! ❌');
-      setTimeout(() => setMessage(null), 3000);
-    }
+    setMessage('Heutige Mission für ' + (progress.name || config.name) + ' zurückgesetzt!');
+    setTimeout(() => setMessage(null), 2500);
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto p-5 shadow-2xl space-y-5">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-indigo-400" />
             <h3 className="text-base font-black text-white">
-              Einstellungen & Geschwister-Sync
+              Einstellungen
             </h3>
           </div>
           <button
@@ -105,47 +95,123 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {message && (
-          <div className="p-3 rounded-xl bg-indigo-950/80 border border-indigo-700/60 text-indigo-200 text-xs text-center font-semibold animate-fadeIn">
+          <div className="p-2.5 rounded-xl bg-indigo-950/80 border border-indigo-700/60 text-indigo-200 text-xs text-center font-semibold animate-fadeIn">
             {message}
           </div>
         )}
 
-        {/* Profile Switcher */}
-        <div>
-          <label className="text-xs font-bold text-slate-300 block mb-2">
-            Aktives Geschwister-Profil wählen:
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {(['sister', 'brother1', 'brother2'] as ProfileId[]).map((id) => {
-              const prof = PROFILES[id];
-              const isSelected = squadState.activeProfileId === id;
-              return (
+        {/* Profile Card & Name Edit */}
+        <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl">{config.userAvatar}</span>
+              <div>
+                <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                  {progress.name || config.name}
+                  <span className="text-[10px] px-1.5 py-0.2 bg-indigo-950 text-indigo-300 rounded font-mono border border-indigo-800/50">
+                    {config.mbti}
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-400">
+                  {config.title}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsEditingName(!isEditingName)}
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700"
+              title="Name anpassen"
+            >
+              <Edit2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Inline Name Edit Input */}
+          {isEditingName && (
+            <div className="mt-3 pt-3 border-t border-slate-800 space-y-2">
+              <label className="text-[11px] font-semibold text-slate-300 block">
+                Dein Name / Spitzname:
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  maxLength={20}
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-500 font-bold"
+                />
                 <button
-                  key={id}
-                  onClick={() => handleSelectProfile(id)}
-                  className={`p-3 rounded-2xl border text-center transition-all ${
-                    isSelected
-                      ? 'bg-indigo-600/30 border-indigo-500 shadow-md shadow-indigo-500/20'
-                      : 'bg-slate-800/60 border-slate-700/80 hover:bg-slate-800'
-                  }`}
+                  onClick={handleSaveName}
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center gap-1"
                 >
-                  <div className="text-2xl mb-1">{prof.userAvatar}</div>
-                  <div className="text-xs font-bold text-white">{prof.name}</div>
-                  <div className="text-[10px] text-slate-400 font-mono">
-                    {prof.mbti}
-                  </div>
+                  <Check className="w-3.5 h-3.5" />
+                  Speichern
                 </button>
-              );
-            })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Profile Switcher (Only shown if NOT dedicated device) */}
+        {!squadState.dedicatedProfileId && (
+          <div>
+            <label className="text-xs font-bold text-slate-300 block mb-2">
+              Profil wechseln (Gemeinsamer Test-Modus):
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {(['sister', 'brother1', 'brother2'] as ProfileId[]).map((id) => {
+                const prof = PROFILES[id];
+                const p = squadState.profiles[id];
+                const isSelected = squadState.activeProfileId === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => handleSelectProfile(id)}
+                    className={`p-2.5 rounded-2xl border text-center transition-all ${
+                      isSelected
+                        ? 'bg-indigo-600/30 border-indigo-500 shadow-md shadow-indigo-500/20'
+                        : 'bg-slate-800/60 border-slate-700/80 hover:bg-slate-800'
+                    }`}
+                  >
+                    <div className="text-xl mb-0.5">{prof.userAvatar}</div>
+                    <div className="text-[11px] font-bold text-white truncate">
+                      {p.name || prof.name}
+                    </div>
+                    <div className="text-[9px] text-slate-400 font-mono">
+                      {prof.mbti}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Silent Cloud-Sync Card */}
+        <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-950/60 border border-emerald-800 flex items-center justify-center text-emerald-400">
+              <Cloud className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                Automatischer Cloud-Sync
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              </div>
+              <div className="text-[10px] text-slate-400">
+                Fortschritt wird lautlos im Hintergrund gesichert
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Audio / SFX Toggle */}
-        <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+        <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-white">Soundeffekte</div>
-            <div className="text-[11px] text-slate-400">
-              Interaktive Töne beim Tippen & Lösen
+            <div className="text-[10px] text-slate-400">
+              Töne beim Tippen und Lösen
             </div>
           </div>
           <button
@@ -164,28 +230,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        {/* Admin Section for Big Brother */}
-        <div className="pt-3 border-t border-slate-800 space-y-3">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider">
-            <Shield className="w-4 h-4" />
-            Admin-Bereich (Für den großen Bruder)
+        {/* Admin Tools for Big Brother */}
+        <div className="pt-2 border-t border-slate-800 space-y-2">
+          <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+            <Shield className="w-3 h-3" />
+            Admin-Optionen (Für den großen Bruder)
           </div>
 
-          {/* Test Mode Toggle */}
-          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
             <div>
-              <div className="text-xs font-bold text-slate-200">
-                ⚡ Schnelltest-Modus (24h-Sperre aus)
-              </div>
-              <div className="text-[10px] text-slate-400">
-                Ermöglicht sofortiges Durchtesten aller Tage
+              <div className="text-xs font-semibold text-slate-200">
+                ⚡ Schnelltest (24h-Sperre aus)
               </div>
             </div>
             <button
               onClick={handleToggleTestMode}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
                 squadState.testModeUnlocked
-                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
+                  ? 'bg-amber-500 text-slate-950 border-amber-400'
                   : 'bg-slate-800 text-slate-400 border-slate-700'
               }`}
             >
@@ -193,61 +255,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
           </div>
 
-          {/* Reset Today's mission for current user */}
           <button
             onClick={handleResetToday}
-            className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-xs font-semibold text-slate-300 border border-slate-700 flex items-center justify-center gap-2 transition-all active:scale-98"
+            className="w-full py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-[11px] font-semibold text-slate-300 border border-slate-700 flex items-center justify-center gap-1.5 transition-all"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Heutige Mission zurücksetzen (für erneuten Durchlauf)
+            <RefreshCw className="w-3 h-3" />
+            Heutigen Tag zurücksetzen
           </button>
-        </div>
-
-        {/* Backup & Restore (Zero-Login Cloud/Code Sync) */}
-        <div className="pt-3 border-t border-slate-800 space-y-3">
-          <div className="text-xs font-bold text-slate-300">
-            Geschwister-Fortschritt sichern (Backup / Handy-Wechsel)
-          </div>
-          <p className="text-[11px] text-slate-400">
-            Wenn ein Geschwisterkind das Handy wechselt: Code hier kopieren und auf dem neuen Handy einfügen.
-          </p>
-
-          <div className="flex gap-2">
-            <button
-              onClick={handleCopyBackup}
-              className="flex-1 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow active:scale-98"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-emerald-300" />
-                  Kopiert!
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" />
-                  Backup-Code kopieren
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="space-y-1.5 pt-1">
-            <input
-              type="text"
-              placeholder="Backup-Code hier einfügen..."
-              value={importCode}
-              onChange={(e) => setImportCode(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
-            />
-            <button
-              onClick={handleImportBackup}
-              disabled={!importCode.trim()}
-              className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 border border-slate-700 active:scale-98"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              Fortschritt wiederherstellen
-            </button>
-          </div>
         </div>
       </div>
     </div>

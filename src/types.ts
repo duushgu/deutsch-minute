@@ -64,7 +64,7 @@ export interface DayLesson {
 
 export interface SiblingProgress {
   profileId: ProfileId;
-  name: string;
+  name: string; // User-customized display name
   mbti: MBTIType;
   currentDay: number;
   completedDays: number[];
@@ -73,11 +73,15 @@ export interface SiblingProgress {
   xp: number;
   badges: string[];
   lastActiveTimestamp: number;
+  hasCompletedOnboarding: boolean;
 }
 
 export interface SquadState {
   version: number;
   profiles: Record<ProfileId, SiblingProgress>;
   activeProfileId: ProfileId;
-  testModeUnlocked: boolean; // secret admin toggle for testing without waiting 24h
+  dedicatedProfileId: ProfileId | null; // locked if opened via personalized link
+  testModeUnlocked: boolean; // admin toggle for testing
+  cloudSyncUrl?: string;
+  lastSyncTimestamp?: number;
 }

@@ -33,12 +33,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
             <div>
               <div className="text-xs font-bold text-slate-100 flex items-center gap-1">
-                {config.name}
+                {progress.name || config.name}
                 <span className="text-[10px] px-1.5 py-0.2 bg-indigo-950 text-indigo-300 rounded font-mono border border-indigo-800/50">
                   {config.mbti}
                 </span>
               </div>
-              <div className="text-[10px] text-slate-400">Tag {progress.currentDay}/60</div>
+              <div className="text-[10px] text-slate-400 flex items-center gap-1.5">
+                <span>Tag {progress.currentDay}/60</span>
+                <span>•</span>
+                <span className="text-emerald-400">☁️ Sync</span>
+              </div>
             </div>
           </button>
         </div>

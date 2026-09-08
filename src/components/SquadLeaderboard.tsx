@@ -97,7 +97,7 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-base font-bold text-white">
-                        {config.name}
+                        {progress.name || config.name}
                       </span>
                       <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 font-mono border border-indigo-800/50">
                         {config.mbti}
@@ -155,13 +155,13 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                 </div>
               </div>
 
-              {/* Switch Profile Button */}
-              {!isCurrentActive && (
+              {/* Switch Profile Button (Only shown if shared multi-profile device) */}
+              {!isCurrentActive && !squadState.dedicatedProfileId && (
                 <button
                   onClick={() => onSelectProfile(id)}
                   className="w-full mt-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-all active:scale-98"
                 >
-                  Zu {config.name} wechseln
+                  Zu {progress.name || config.name} wechseln
                 </button>
               )}
             </div>

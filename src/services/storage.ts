@@ -1,7 +1,8 @@
 import { ProfileId, SiblingProgress, SquadState } from '../types';
 import { PROFILES } from '../data/profiles';
 
-const STORAGE_KEY = 'deutsch_minute_squad_v1';
+const STORAGE_KEY = 'deutsch_minute_squad_v2';
+const DEDICATED_KEY = 'deutsch_minute_dedicated_profile';
 
 export function getTodayDateString(): string {
   const now = new Date();
@@ -9,6 +10,25 @@ export function getTodayDateString(): string {
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+export function detectUrlProfile(): ProfileId | null {
+  if (typeof window === 'undefined') return null;
+
+  // Check query param: ?p=anu, ?p=temuulen, ?p=batu
+  const params = new URLSearchParams(window.location.search);
+  const pParam = params.get('p')?.toLowerCase();
+
+  // Check hash: #anu, #temuulen, #batu
+  const hash = window.location.hash.replace('#', '').toLowerCase();
+
+  const target = pParam || hash;
+
+  if (target === 'anu' || target === 'sister') return 'sister';
+  if (target === 'temuulen' || target === 'temu' || target === 'brother1') return 'brother1';
+  if (target === 'batu' || target === 'brother2') return 'brother2';
+
+  return null;
 }
 
 function createDefaultSiblingProgress(id: ProfileId): SiblingProgress {
@@ -24,13 +44,16 @@ function createDefaultSiblingProgress(id: ProfileId): SiblingProgress {
     xp: 0,
     badges: [],
     lastActiveTimestamp: Date.now(),
+    hasCompletedOnboarding: false,
   };
 }
 
-export function getDefaultSquadState(): SquadState {
+export function getDefaultSquadState(dedicatedId: ProfileId | null = null): SquadState {
+  const active = dedicatedId || 'brother1';
   return {
-    version: 1,
-    activeProfileId: 'brother1',
+    version: 2,
+    activeProfileId: active,
+    dedicatedProfileId: dedicatedId,
     testModeUnlocked: false,
     profiles: {
       sister: createDefaultSiblingProgress('sister'),
@@ -42,19 +65,35 @@ export function getDefaultSquadState(): SquadState {
 
 export function loadSquadState(): SquadState {
   try {
+    const urlProfile = detectUrlProfile();
+    const storedDedicated = localStorage.getItem(DEDICATED_KEY) as ProfileId | null;
+    const effectiveDedicated = urlProfile || storedDedicated || null;
+
+    if (effectiveDedicated) {
+      localStorage.setItem(DEDICATED_KEY, effectiveDedicated);
+    }
+
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const def = getDefaultSquadState();
+      const def = getDefaultSquadState(effectiveDedicated);
       saveSquadState(def);
       return def;
     }
+
     const parsed = JSON.parse(raw) as SquadState;
+
     // Ensure all profiles exist
     (['sister', 'brother1', 'brother2'] as ProfileId[]).forEach((id) => {
       if (!parsed.profiles[id]) {
         parsed.profiles[id] = createDefaultSiblingProgress(id);
       }
     });
+
+    if (effectiveDedicated) {
+      parsed.dedicatedProfileId = effectiveDedicated;
+      parsed.activeProfileId = effectiveDedicated;
+    }
+
     return parsed;
   } catch {
     return getDefaultSquadState();
@@ -64,13 +103,32 @@ export function loadSquadState(): SquadState {
 export function saveSquadState(state: SquadState): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    // Trigger silent cloud sync in background if online
+    silentCloudSync(state).catch(() => {});
   } catch (err) {
     console.error('Error saving squad state:', err);
   }
 }
 
+export function updateCustomName(state: SquadState, profileId: ProfileId, newName: string): SquadState {
+  const profile = state.profiles[profileId];
+  const updated: SquadState = {
+    ...state,
+    profiles: {
+      ...state.profiles,
+      [profileId]: {
+        ...profile,
+        name: newName.trim() || profile.name,
+        hasCompletedOnboarding: true,
+      },
+    },
+  };
+  saveSquadState(updated);
+  return updated;
+}
+
 export function isCompletedToday(progress: SiblingProgress, testModeUnlocked: boolean): boolean {
-  if (testModeUnlocked) return false; // In test mode, always unlocked!
+  if (testModeUnlocked) return false;
   if (!progress.lastCompletedDate) return false;
   return progress.lastCompletedDate === getTodayDateString();
 }
@@ -79,7 +137,6 @@ export function completeDayLesson(state: SquadState, profileId: ProfileId, day: 
   const today = getTodayDateString();
   const profile = state.profiles[profileId];
 
-  // Calculate streak
   let newStreak = profile.streak;
   if (profile.lastCompletedDate) {
     const lastDate = new Date(profile.lastCompletedDate);
@@ -90,10 +147,8 @@ export function completeDayLesson(state: SquadState, profileId: ProfileId, day: 
     if (diffDays === 1) {
       newStreak += 1;
     } else if (diffDays === 0) {
-      // Already completed today
       newStreak = Math.max(1, newStreak);
     } else {
-      // Streak broke, reset to 1
       newStreak = 1;
     }
   } else {
@@ -130,22 +185,26 @@ export function completeDayLesson(state: SquadState, profileId: ProfileId, day: 
   return updatedState;
 }
 
-// Export state as base64 string (for easy copy-paste)
-export function exportStateString(state: SquadState): string {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-}
+// Silent cloud sync function:
+// Sends payload to cloud endpoint if configured, or fails gracefully without bothering user
+export async function silentCloudSync(state: SquadState): Promise<boolean> {
+  if (!state.cloudSyncUrl) return false;
 
-// Import state from base64 string
-export function importStateString(encoded: string): SquadState | null {
   try {
-    const jsonStr = decodeURIComponent(escape(atob(encoded)));
-    const parsed = JSON.parse(jsonStr) as SquadState;
-    if (parsed.version && parsed.profiles) {
-      saveSquadState(parsed);
-      return parsed;
-    }
-    return null;
+    const active = state.activeProfileId;
+    const progress = state.profiles[active];
+
+    await fetch(state.cloudSyncUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profileId: active,
+        progress,
+        timestamp: Date.now(),
+      }),
+    });
+    return true;
   } catch {
-    return null;
+    return false;
   }
 }

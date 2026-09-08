@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { ChatSession } from './components/ChatSession';
 import { LockoutScreen } from './components/LockoutScreen';
 import { SquadLeaderboard } from './components/SquadLeaderboard';
 import { ArchiveScreen } from './components/ArchiveScreen';
 import { SettingsModal } from './components/SettingsModal';
+import { OnboardingModal } from './components/OnboardingModal';
 import { PROFILES } from './data/profiles';
 import { CURRICULUM } from './data/curriculum';
 import {
   loadSquadState,
   completeDayLesson,
   isCompletedToday,
+  updateCustomName,
 } from './services/storage';
 import { ProfileId, SquadState } from './types';
 
@@ -31,6 +33,12 @@ export const App: React.FC = () => {
     lessons[0];
 
   const isTodayDone = isCompletedToday(progress, squadState.testModeUnlocked);
+  const displayName = progress.name || config.name;
+
+  // Dynamically set title for Android PWA "Add to Home Screen"
+  useEffect(() => {
+    document.title = `${displayName} ${config.userAvatar} Deutsch Minute`;
+  }, [displayName, config.userAvatar]);
 
   const handleCompleteLesson = (day: number) => {
     const updated = completeDayLesson(squadState, activeProfile, day);
@@ -42,6 +50,11 @@ export const App: React.FC = () => {
       ...prev,
       activeProfileId: id,
     }));
+  };
+
+  const handleSaveOnboardingName = (newName: string) => {
+    const updated = updateCustomName(squadState, activeProfile, newName);
+    setSquadState(updated);
   };
 
   // Dynamic Theme Class
@@ -75,6 +88,7 @@ export const App: React.FC = () => {
               <ChatSession
                 lesson={currentLesson}
                 config={config}
+                userName={displayName}
                 onComplete={handleCompleteLesson}
               />
             )}
@@ -93,7 +107,16 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Settings / Admin Modal */}
+      {/* First-Time Name Onboarding Modal */}
+      {!progress.hasCompletedOnboarding && (
+        <OnboardingModal
+          config={config}
+          currentName={displayName}
+          onSaveName={handleSaveOnboardingName}
+        />
+      )}
+
+      {/* Settings Modal */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

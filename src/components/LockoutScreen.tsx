@@ -117,16 +117,16 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
             >
               <div>
                 <div className="text-[11px] font-bold text-indigo-300 mb-0.5">
-                  {turn.speaker === 'partner' ? config.partnerName : config.name}
+                  {turn.speaker === 'partner' ? config.partnerName : (progress.name || config.name)}
                 </div>
                 <div className="text-sm font-semibold text-white">
-                  {turn.textDe}
+                  {turn.textDe.replace(new RegExp(config.name, 'g'), progress.name || config.name)}
                 </div>
                 <div className="text-[11px] font-mono text-indigo-400">
-                  {turn.phoneticMn}
+                  {turn.phoneticMn.replace(new RegExp(config.name, 'g'), progress.name || config.name)}
                 </div>
                 <div className="text-[10px] text-slate-400 mt-0.5">
-                  {turn.textMn}
+                  {turn.textMn.replace(new RegExp(config.name, 'g'), progress.name || config.name)}
                 </div>
               </div>
 
