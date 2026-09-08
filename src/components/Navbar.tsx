@@ -81,17 +81,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           1-Min Quest
         </button>
 
-        <button
-          onClick={() => setActiveTab('squad')}
-          className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3 rounded-full transition-all ${
-            activeTab === 'squad'
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Users className="w-3.5 h-3.5" />
-          Squad
-        </button>
+        {/* Squad is ONLY visible for ISTP (Томоо - brother1) */}
+        {config.id === 'brother1' && (
+          <button
+            onClick={() => setActiveTab('squad')}
+            className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3 rounded-full transition-all ${
+              activeTab === 'squad'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            Squad
+          </button>
+        )}
 
         <button
           onClick={() => setActiveTab('archive')}

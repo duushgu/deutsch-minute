@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Flame, CheckCircle2, Clock, Sparkles, Zap } from 'lucide-react';
+import { Users, Flame, CheckCircle2, Clock } from 'lucide-react';
 import { ProfileId, SquadState } from '../types';
 import { PROFILES } from '../data/profiles';
 import { isCompletedToday } from '../services/storage';
@@ -14,10 +14,6 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
   onSelectProfile,
 }) => {
   const profileIds: ProfileId[] = ['sister', 'brother1', 'brother2'];
-
-  const allCompletedToday = profileIds.every((id) =>
-    isCompletedToday(squadState.profiles[id], squadState.testModeUnlocked)
-  );
 
   const totalCompletedQuests = profileIds.reduce(
     (acc, id) => acc + (squadState.profiles[id]?.completedDays?.length || 0),
@@ -46,28 +42,6 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
               Дууссан хичээл
             </div>
           </div>
-        </div>
-
-        {/* Triple Combo Banner */}
-        <div className="mt-4 pt-3 border-t border-indigo-900/50">
-          {allCompletedToday ? (
-            <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-500/20 to-emerald-500/20 border border-amber-500/40 flex items-center gap-2.5">
-              <Zap className="w-5 h-5 text-amber-400 fill-amber-400 animate-bounce" />
-              <div>
-                <div className="text-xs font-black text-amber-300">
-                  ⚡ 3/3 TRIPLE COMBO ИДЭВХЖЛЭЭ! ⚡
-                </div>
-                <div className="text-[10px] text-slate-300">
-                  Бүгд өнөөдрийн 1 минутаа хийлээ! Багийн гайхалтай амжилт! 🔥
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-xs text-slate-400 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              Бүгдээрээ өдөрт 1 минут сурвал Triple-Combo идэвхжинэ! ⭐
-            </div>
-          )}
         </div>
       </div>
 

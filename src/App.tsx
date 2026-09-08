@@ -85,6 +85,10 @@ export const App: React.FC = () => {
   }, []);
 
   const handleTabChange = (tab: 'chat' | 'squad' | 'archive') => {
+    if (tab === 'squad' && activeProfile !== 'brother1') {
+      setActiveTab('chat');
+      return;
+    }
     setActiveTab(tab);
     if (tab === 'squad') {
       syncWithCloud(squadState).then(setSquadState);
@@ -158,7 +162,7 @@ export const App: React.FC = () => {
           </>
         )}
 
-        {activeTab === 'squad' && (
+        {activeTab === 'squad' && activeProfile === 'brother1' && (
           <SquadLeaderboard
             squadState={squadState}
             onSelectProfile={handleSelectProfile}
