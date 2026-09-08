@@ -112,20 +112,19 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     if (isMatch) {
       soundFX.playCorrect();
       setCurrentStep(2);
-      // Play user's sentence in native voice
-      playAudio(turn2.audioKey, turn2.textDe);
+      // User audio does not autoplay (on-demand only via speaker icon per user preference)
 
-      // Show typing indicator after user sentence begins
+      // Show typing indicator after brief pause
       setTimeout(() => {
         setIsPartnerTyping(true);
-      }, 1000);
+      }, 400);
 
       // Advance to partner reply after natural delay
       setTimeout(() => {
         setIsPartnerTyping(false);
         setCurrentStep(3);
         playAudio(turn3.audioKey, turn3.textDe);
-      }, 2500);
+      }, 2200);
     } else {
       soundFX.playError();
       setHasError(true);
@@ -136,17 +135,17 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     if (isCorrect) {
       soundFX.playCorrect();
       setCurrentStep(2);
-      playAudio(turn2.audioKey, turn2.textDe);
+      // User audio does not autoplay (on-demand only via speaker icon per user preference)
 
       setTimeout(() => {
         setIsPartnerTyping(true);
-      }, 1000);
+      }, 400);
 
       setTimeout(() => {
         setIsPartnerTyping(false);
         setCurrentStep(3);
         playAudio(turn3.audioKey, turn3.textDe);
-      }, 2500);
+      }, 2200);
     } else {
       soundFX.playError();
       setHasError(true);
@@ -275,10 +274,11 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                 {currentStep >= 2 && (
                   <button
                     onClick={() => playAudio(turn2.audioKey, turn2.textDe)}
-                    className="p-1 rounded-full bg-slate-900/60 text-slate-300 hover:text-white border border-slate-700/60 transition-all"
-                    title="Сонсох"
+                    className="px-2 py-1 rounded-full bg-slate-900/70 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60 transition-all flex items-center gap-1 text-[11px] font-semibold active:scale-95 shadow-sm"
+                    title="Өөрийн хариултыг сонсох"
                   >
-                    <Volume2 className="w-4 h-4" />
+                    <Volume2 className="w-3.5 h-3.5 text-indigo-300" />
+                    <span>Сонсох</span>
                   </button>
                 )}
               </div>

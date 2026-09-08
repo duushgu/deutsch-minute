@@ -17,7 +17,7 @@ import {
   syncWithCloud,
   getTodayDateString,
 } from './services/storage';
-import { ProfileId, SquadState } from './types';
+import { ProfileConfig, ProfileId, SquadState, ThemeId } from './types';
 
 export const App: React.FC = () => {
   const [squadState, setSquadState] = useState<SquadState>(() => loadSquadState());
@@ -40,6 +40,10 @@ export const App: React.FC = () => {
   const config = PROFILES[activeProfile];
   const progress = squadState.profiles[activeProfile];
   const lessons = CURRICULUM[activeProfile] || [];
+  
+  // Custom user theme override or profile default
+  const effectiveTheme: ThemeId = progress.customTheme || config.theme;
+  const effectiveConfig: ProfileConfig = { ...config, theme: effectiveTheme };
   
   // Lesson for current day (clamped to available lessons)
   const currentLesson =
@@ -125,16 +129,16 @@ export const App: React.FC = () => {
   };
 
   // Dynamic Theme Class
-  const themeClass = `theme-${config.theme}`;
+  const themeClass = `theme-${effectiveTheme}`;
 
   return (
     <div className={`min-h-screen text-slate-100 flex flex-col relative overflow-x-hidden ${themeClass}`}>
       {/* Animated Immersive Theme Environment Background */}
-      <ThemeBackground theme={config.theme} />
+      <ThemeBackground theme={effectiveTheme} />
 
       {/* Top Navigation */}
       <Navbar
-        config={config}
+        config={effectiveConfig}
         progress={progress}
         activeTab={activeTab}
         setActiveTab={handleTabChange}
@@ -149,7 +153,7 @@ export const App: React.FC = () => {
             {isTodayDone ? (
               <LockoutScreen
                 lesson={currentLesson}
-                config={config}
+                config={effectiveConfig}
                 progress={progress}
                 partnerName={partnerName}
                 partnerAvatar={partnerAvatar}
@@ -157,7 +161,7 @@ export const App: React.FC = () => {
             ) : (
               <ChatSession
                 lesson={currentLesson}
-                config={config}
+                config={effectiveConfig}
                 userName={displayName}
                 partnerName={partnerName}
                 partnerAvatar={partnerAvatar}
@@ -175,14 +179,20 @@ export const App: React.FC = () => {
         )}
 
         {activeTab === 'archive' && (
-          <ArchiveScreen config={config} progress={progress} />
+          <ArchiveScreen
+            config={effectiveConfig}
+            progress={progress}
+            showPhoneticsArchiveDays1to5={Boolean(
+              progress.showPhoneticsArchiveDays1to5 ?? squadState.showPhoneticsArchiveDays1to5
+            )}
+          />
         )}
       </main>
 
       {/* First-Time Name & Hero Selection Onboarding Modal */}
       {!progress.hasCompletedOnboarding && (
         <OnboardingModal
-          config={config}
+          config={effectiveConfig}
           defaultPartnerName={config.partnerName}
           defaultPartnerAvatar={config.partnerAvatar}
           onComplete={handleCompleteOnboarding}

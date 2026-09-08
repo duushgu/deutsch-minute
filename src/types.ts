@@ -57,6 +57,8 @@ export interface DayLesson {
   keyVocab: KeyVocab[];
 }
 
+export type ThemeId = 'kdrama' | 'gamer' | 'cozy';
+
 export interface SiblingProgress {
   profileId: ProfileId;
   name: string; // User-customized display name
@@ -70,6 +72,8 @@ export interface SiblingProgress {
   badges: string[];
   lastActiveTimestamp: number;
   hasCompletedOnboarding: boolean;
+  customTheme?: ThemeId; // user-selected theme
+  showPhoneticsArchiveDays1to5?: boolean; // phonetics setting (only days 1-5 in archive)
 }
 
 export interface SquadState {
@@ -78,6 +82,7 @@ export interface SquadState {
   activeProfileId: ProfileId;
   dedicatedProfileId: ProfileId | null; // locked if opened via dedicated app
   testModeUnlocked: boolean; // admin toggle for testing
+  showPhoneticsArchiveDays1to5?: boolean; // global fallback setting
   cloudSyncUrl?: string;
   lastSyncTimestamp?: number;
 }

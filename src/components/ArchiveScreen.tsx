@@ -8,11 +8,13 @@ import { formatDialogueText } from '../services/storage';
 interface ArchiveScreenProps {
   config: ProfileConfig;
   progress: SiblingProgress;
+  showPhoneticsArchiveDays1to5?: boolean;
 }
 
 export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
   config,
   progress,
+  showPhoneticsArchiveDays1to5 = false,
 }) => {
   const lessons: DayLesson[] = CURRICULUM[config.id] || [];
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
@@ -140,32 +142,43 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    {lesson.dialogue.map((turn) => (
-                      <div
-                        key={turn.id}
-                        className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start justify-between gap-2"
-                      >
-                        <div>
-                          <div className="text-[10px] font-bold text-slate-400 mb-0.5">
-                            {turn.speaker === 'partner' ? partnerName : userName}
-                          </div>
-                          <div className="text-xs font-semibold text-white">
-                            {formatDialogueText(turn.textDe, config.name, userName, config.partnerName, partnerName)}
-                          </div>
-                          <div className="text-[10px] text-slate-400 mt-0.5">
-                            {formatDialogueText(turn.textMn, config.name, userName, config.partnerName, partnerName)}
-                          </div>
-                        </div>
+                    {lesson.dialogue.map((turn) => {
+                      const shouldShowPhonetics =
+                        Boolean(showPhoneticsArchiveDays1to5 || progress.showPhoneticsArchiveDays1to5) &&
+                        lesson.day <= 5;
 
-                        <button
-                          onClick={() => playAudio(turn.audioKey, turn.textDe)}
-                          className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 shrink-0 active:scale-95"
-                          title="Сонсох"
+                      return (
+                        <div
+                          key={turn.id}
+                          className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start justify-between gap-2"
                         >
-                          <Volume2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
+                          <div>
+                            <div className="text-[10px] font-bold text-slate-400 mb-0.5">
+                              {turn.speaker === 'partner' ? partnerName : userName}
+                            </div>
+                            <div className="text-xs font-semibold text-white">
+                              {formatDialogueText(turn.textDe, config.name, userName, config.partnerName, partnerName)}
+                            </div>
+                            {shouldShowPhonetics && turn.phoneticMn && (
+                              <div className="text-[10px] text-amber-300 font-mono bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 inline-block mt-0.5">
+                                [{formatDialogueText(turn.phoneticMn, config.name, userName, config.partnerName, partnerName)}]
+                              </div>
+                            )}
+                            <div className="text-[10px] text-slate-400 mt-0.5">
+                              {formatDialogueText(turn.textMn, config.name, userName, config.partnerName, partnerName)}
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => playAudio(turn.audioKey, turn.textDe)}
+                            className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 shrink-0 active:scale-95"
+                            title="Сонсох"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
