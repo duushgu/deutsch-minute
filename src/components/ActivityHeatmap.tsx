@@ -102,9 +102,6 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
           <span className="text-xs font-bold text-slate-200">
             60 өдрийн идэвх
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">
-            (GitHub хэв маяг)
-          </span>
         </div>
         <div className="flex items-center gap-1 font-mono text-[11px] text-slate-300">
           <Sparkles className={`w-3 h-3 ${themeTextClass}`} />

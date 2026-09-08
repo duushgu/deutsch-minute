@@ -131,10 +131,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   {progress.partnerAvatar || config.partnerAvatar} {partnerName}
                 </span>
               </div>
-              <div className="text-[10px] text-slate-500 font-mono mt-0.5">
-                {config.id === 'sister' && 'INFJ • Нигүүлсэгч, Тууштай'}
-                {config.id === 'brother1' && 'ISTP • Тактикч, Gaming'}
-                {config.id === 'brother2' && 'ISFJ • Багийн хамгаалагч, Anime'}
+              <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                {config.id === 'sister' && '🌸 K-Drama & Дурсамж'}
+                {config.id === 'brother1' && '⚡ Тулааны талбар & Gaming'}
+                {config.id === 'brother2' && '🛡️ Баатрын зам & Анимэ'}
               </div>
             </div>
           </div>
