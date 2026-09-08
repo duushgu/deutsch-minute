@@ -5,6 +5,7 @@ import { PROFILES } from '../data/profiles';
 import { FRIENDS_BY_PROFILE, FriendCharacter } from '../data/friends';
 import { soundFX } from '../services/soundEffects';
 import { updateCustomName, saveSquadState } from '../services/storage';
+import { ActivityHeatmap } from './ActivityHeatmap';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -329,6 +330,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
         </div>
+
+        {/* 60-Day Minimal Activity Heatmap in Profile Modal */}
+        <ActivityHeatmap progress={progress} theme={effectiveTheme} />
 
         {/* Change Partner Button */}
         <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800">

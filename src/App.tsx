@@ -4,6 +4,7 @@ import { ChatSession } from './components/ChatSession';
 import { LockoutScreen } from './components/LockoutScreen';
 import { SquadLeaderboard } from './components/SquadLeaderboard';
 import { ArchiveScreen } from './components/ArchiveScreen';
+import { ProfileScreen } from './components/ProfileScreen';
 import { SettingsModal } from './components/SettingsModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { ThemeBackground } from './components/ThemeBackground';
@@ -21,7 +22,7 @@ import { ProfileConfig, ProfileId, SquadState, ThemeId } from './types';
 
 export const App: React.FC = () => {
   const [squadState, setSquadState] = useState<SquadState>(() => loadSquadState());
-  const [activeTab, setActiveTab] = useState<'chat' | 'squad' | 'archive'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'squad' | 'archive' | 'profile'>('chat');
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [currentDateStr, setCurrentDateStr] = useState<string>(() => getTodayDateString());
 
@@ -90,7 +91,7 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const handleTabChange = (tab: 'chat' | 'squad' | 'archive') => {
+  const handleTabChange = (tab: 'chat' | 'squad' | 'archive' | 'profile') => {
     if (tab === 'squad' && activeProfile !== 'brother1') {
       setActiveTab('chat');
       return;
@@ -185,6 +186,16 @@ export const App: React.FC = () => {
             showPhoneticsArchiveDays1to5={Boolean(
               progress.showPhoneticsArchiveDays1to5 ?? squadState.showPhoneticsArchiveDays1to5
             )}
+          />
+        )}
+
+        {activeTab === 'profile' && (
+          <ProfileScreen
+            config={effectiveConfig}
+            progress={progress}
+            squadState={squadState}
+            onUpdateSquadState={setSquadState}
+            onOpenSettings={() => setIsSettingsOpen(true)}
           />
         )}
       </main>

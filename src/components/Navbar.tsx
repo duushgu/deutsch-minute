@@ -1,12 +1,12 @@
 import React from 'react';
-import { Flame, Settings, Users, BookOpen, MessageCircle } from 'lucide-react';
+import { Flame, Settings, Users, BookOpen, MessageCircle, User } from 'lucide-react';
 import { ProfileConfig, SiblingProgress } from '../types';
 
 interface NavbarProps {
   config: ProfileConfig;
   progress: SiblingProgress;
-  activeTab: 'chat' | 'squad' | 'archive';
-  setActiveTab: (tab: 'chat' | 'squad' | 'archive') => void;
+  activeTab: 'chat' | 'squad' | 'archive' | 'profile';
+  setActiveTab: (tab: 'chat' | 'squad' | 'archive' | 'profile') => void;
   onOpenSettings: () => void;
   testModeUnlocked: boolean;
 }
@@ -76,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Profile Info */}
         <div className="flex items-center gap-2.5">
           <button
-            onClick={onOpenSettings}
+            onClick={() => setActiveTab('profile')}
             className="flex items-center gap-2 bg-slate-900/60 hover:bg-slate-800/80 p-1.5 pr-3 rounded-full border border-slate-700/60 backdrop-blur transition-all text-left"
           >
             <span className={`w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-inner border ${avatarBgClass}`}>
@@ -149,7 +149,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <button
           onClick={() => setActiveTab('archive')}
-          className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3.5 rounded-full transition-all ${
+          className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3 rounded-full transition-all ${
             activeTab === 'archive'
               ? tabActiveClass
               : 'text-slate-400 hover:text-slate-200'
@@ -157,6 +157,18 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <BookOpen className="w-3.5 h-3.5" />
           Архив
+        </button>
+
+        <button
+          onClick={() => setActiveTab('profile')}
+          className={`flex items-center gap-1.5 text-xs font-semibold py-1 px-3 rounded-full transition-all ${
+            activeTab === 'profile'
+              ? tabActiveClass
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <User className="w-3.5 h-3.5" />
+          Профайл
         </button>
       </div>
     </header>
