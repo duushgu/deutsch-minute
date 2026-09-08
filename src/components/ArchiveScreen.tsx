@@ -131,10 +131,7 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
                           <div className="text-xs font-semibold text-white">
                             {formatDialogueText(turn.textDe, config.name, userName, config.partnerName, partnerName)}
                           </div>
-                          <div className="text-[11px] font-mono text-indigo-400">
-                            {formatDialogueText(turn.phoneticMn, config.name, userName, config.partnerName, partnerName)}
-                          </div>
-                          <div className="text-[10px] text-slate-400">
+                          <div className="text-[10px] text-slate-400 mt-0.5">
                             {formatDialogueText(turn.textMn, config.name, userName, config.partnerName, partnerName)}
                           </div>
                         </div>

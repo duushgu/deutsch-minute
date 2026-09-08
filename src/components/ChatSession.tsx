@@ -34,6 +34,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   const [availableWords, setAvailableWords] = useState<string[]>([]);
   const [hasError, setHasError] = useState<boolean>(false);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
+  const [isPartnerTyping, setIsPartnerTyping] = useState<boolean>(false);
 
   const turn1 = lesson.dialogue[0]; // Partner
   const turn2 = lesson.dialogue[1]; // User challenge
@@ -49,6 +50,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     setSelectedWords([]);
     setHasError(false);
     setElapsedSeconds(0);
+    setIsPartnerTyping(false);
   }, [lesson.day]);
 
   // Timer: counts up to 60 seconds
@@ -112,11 +114,18 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
       setCurrentStep(2);
       // Play user's sentence in native voice
       playAudio(turn2.audioKey, turn2.textDe);
-      // Advance to partner reply after short delay
+
+      // Show typing indicator after user sentence begins
       setTimeout(() => {
+        setIsPartnerTyping(true);
+      }, 1000);
+
+      // Advance to partner reply after natural delay
+      setTimeout(() => {
+        setIsPartnerTyping(false);
         setCurrentStep(3);
         playAudio(turn3.audioKey, turn3.textDe);
-      }, 1500);
+      }, 2500);
     } else {
       soundFX.playError();
       setHasError(true);
@@ -128,10 +137,16 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
       soundFX.playCorrect();
       setCurrentStep(2);
       playAudio(turn2.audioKey, turn2.textDe);
+
       setTimeout(() => {
+        setIsPartnerTyping(true);
+      }, 1000);
+
+      setTimeout(() => {
+        setIsPartnerTyping(false);
         setCurrentStep(3);
         playAudio(turn3.audioKey, turn3.textDe);
-      }, 1500);
+      }, 2500);
     } else {
       soundFX.playError();
       setHasError(true);
@@ -197,10 +212,6 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
             <p className="text-base font-semibold text-white tracking-wide">
               {formatText(turn1.textDe)}
             </p>
-            {/* Mongolian Cyrillic Phonetics */}
-            <div className="mt-1.5 inline-block px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-800/40 text-indigo-200 text-xs font-mono">
-              {formatText(turn1.phoneticMn)}
-            </div>
             {/* Mongolian Translation */}
             <p className="mt-1.5 text-xs text-slate-400">
               {formatText(turn1.textMn)}
@@ -237,10 +248,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     {formatText(turn2.textDe)}
                   </p>
-                  <div className="mt-1.5 inline-block px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-emerald-300 text-xs font-mono">
-                    {formatText(turn2.phoneticMn)}
-                  </div>
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1.5 text-xs text-slate-400">
                     {formatText(turn2.textMn)}
                   </p>
                 </div>
@@ -322,9 +330,6 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                           <div className="text-xs font-bold text-white">
                             {formatText(c.textDe)}
                           </div>
-                          <div className="text-[10px] text-indigo-300 font-mono mt-0.5">
-                            {formatText(c.phoneticMn)}
-                          </div>
                           <div className="text-[10px] text-slate-400 mt-0.5">
                             {formatText(c.textMn)}
                           </div>
@@ -340,6 +345,25 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Partner Typing Indicator */}
+        {isPartnerTyping && currentStep === 2 && (
+          <div className="flex items-center gap-2.5 animate-pulse">
+            <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow shrink-0">
+              {partnerAvatar}
+            </div>
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm px-4 py-2.5 shadow-md flex items-center gap-2">
+              <span className="text-xs text-slate-400 font-medium">
+                {partnerName} бичиж байна...
+              </span>
+              <div className="flex gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
             </div>
           </div>
         )}
@@ -366,9 +390,6 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
               <p className="text-base font-semibold text-white tracking-wide">
                 {formatText(turn3.textDe)}
               </p>
-              <div className="mt-1.5 inline-block px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-800/40 text-indigo-200 text-xs font-mono">
-                {formatText(turn3.phoneticMn)}
-              </div>
               <p className="mt-1.5 text-xs text-slate-400">
                 {formatText(turn3.textMn)}
               </p>

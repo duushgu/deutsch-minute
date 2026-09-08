@@ -124,9 +124,6 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
                 <div className="text-sm font-semibold text-white">
                   {formatDialogueText(turn.textDe, config.name, userName, config.partnerName, partnerName)}
                 </div>
-                <div className="text-[11px] font-mono text-indigo-400">
-                  {formatDialogueText(turn.phoneticMn, config.name, userName, config.partnerName, partnerName)}
-                </div>
                 <div className="text-[10px] text-slate-400 mt-0.5">
                   {formatDialogueText(turn.textMn, config.name, userName, config.partnerName, partnerName)}
                 </div>
@@ -154,16 +151,11 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
           {lesson.keyVocab.map((vocab, i) => (
             <div
               key={i}
-              className="p-2 rounded-xl bg-slate-950/50 border border-slate-800 flex items-center justify-between"
+              className="p-2.5 rounded-xl bg-slate-950/50 border border-slate-800 flex items-center justify-between"
             >
-              <div>
-                <span className="text-xs font-bold text-amber-300 mr-2">
-                  {formatDialogueText(vocab.de, config.name, userName, config.partnerName, partnerName)}
-                </span>
-                <span className="text-[11px] font-mono text-slate-400 mr-2">
-                  {formatDialogueText(vocab.ph, config.name, userName, config.partnerName, partnerName)}
-                </span>
-              </div>
+              <span className="text-xs font-bold text-amber-300 mr-2">
+                {formatDialogueText(vocab.de, config.name, userName, config.partnerName, partnerName)}
+              </span>
               <span className="text-xs text-slate-300">
                 {formatDialogueText(vocab.mn, config.name, userName, config.partnerName, partnerName)}
               </span>
