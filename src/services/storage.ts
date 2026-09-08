@@ -1,8 +1,8 @@
 import { ProfileId, SiblingProgress, SquadState } from '../types';
 import { PROFILES } from '../data/profiles';
 
-const STORAGE_KEY = 'deutsch_minute_squad_v3';
-const DEDICATED_KEY = 'deutsch_minute_dedicated_profile_v3';
+const STORAGE_KEY = 'deutsch_minute_squad_v4';
+const DEDICATED_KEY = 'deutsch_minute_dedicated_profile_v4';
 
 export function getTodayDateString(): string {
   const now = new Date();
@@ -40,7 +40,7 @@ function createDefaultSiblingProgress(id: ProfileId): SiblingProgress {
   const config = PROFILES[id];
   return {
     profileId: id,
-    name: config.name,
+    name: '',
     partnerName: config.partnerName,
     partnerAvatar: config.partnerAvatar,
     currentDay: 1,
@@ -49,7 +49,7 @@ function createDefaultSiblingProgress(id: ProfileId): SiblingProgress {
     lastCompletedDate: null,
     xp: 0,
     badges: [],
-    lastActiveTimestamp: Date.now(),
+    lastActiveTimestamp: 0,
     hasCompletedOnboarding: false,
   };
 }
@@ -57,7 +57,7 @@ function createDefaultSiblingProgress(id: ProfileId): SiblingProgress {
 export function getDefaultSquadState(dedicatedId: ProfileId | null = null): SquadState {
   const active = dedicatedId || 'brother1';
   return {
-    version: 3,
+    version: 4,
     activeProfileId: active,
     dedicatedProfileId: dedicatedId,
     testModeUnlocked: false,
@@ -71,6 +71,22 @@ export function getDefaultSquadState(dedicatedId: ProfileId | null = null): Squa
 
 export function loadSquadState(): SquadState {
   try {
+    // Purge old versions
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('deutsch_minute_squad_v3');
+      localStorage.removeItem('deutsch_minute_squad_v2');
+      localStorage.removeItem('deutsch_minute_squad_v1');
+      localStorage.removeItem('deutsch_minute_squad');
+      // If user provided ?reset in URL, wipe everything
+      if (typeof window !== 'undefined' && (window.location.search.includes('reset') || window.location.search.includes('clear'))) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(DEDICATED_KEY);
+        localStorage.removeItem('dm_notes_sister');
+        localStorage.removeItem('dm_notes_brother1');
+        localStorage.removeItem('dm_notes_brother2');
+      }
+    }
+
     const urlProfile = detectUrlProfile();
     const storedDedicated = localStorage.getItem(DEDICATED_KEY) as ProfileId | null;
     const effectiveDedicated = urlProfile || storedDedicated || null;
@@ -87,6 +103,11 @@ export function loadSquadState(): SquadState {
     }
 
     const parsed = JSON.parse(raw) as SquadState;
+    if (!parsed.version || parsed.version < 4) {
+      const def = getDefaultSquadState(effectiveDedicated);
+      saveSquadState(def);
+      return def;
+    }
 
     (['sister', 'brother1', 'brother2'] as ProfileId[]).forEach((id) => {
       if (!parsed.profiles[id]) {
@@ -275,7 +296,33 @@ export function completeDayLesson(
 }
 
 export const FIREBASE_RTDB_BASE = 'https://deutsch-minute-default-rtdb.firebaseio.com';
-export const FIREBASE_SQUAD_URL = `${FIREBASE_RTDB_BASE}/squad`;
+export const FIREBASE_SQUAD_URL = `${FIREBASE_RTDB_BASE}/squad_v4`;
+
+// Complete reset: wipes local storage and forces clean Day 1 state to Firebase
+export async function resetAllProgress(dedicatedId: ProfileId | null = null): Promise<SquadState> {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(DEDICATED_KEY);
+    localStorage.removeItem('dm_notes_sister');
+    localStorage.removeItem('dm_notes_brother1');
+    localStorage.removeItem('dm_notes_brother2');
+  }
+
+  const freshState = getDefaultSquadState(dedicatedId);
+  saveSquadState(freshState);
+
+  try {
+    await fetch(`${FIREBASE_SQUAD_URL}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(freshState.profiles),
+    });
+  } catch (e) {
+    console.error('Firebase reset error:', e);
+  }
+
+  return freshState;
+}
 
 // Background silent push to Firebase Realtime Database
 export async function silentCloudSync(state: SquadState): Promise<boolean> {

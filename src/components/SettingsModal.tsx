@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { X, Volume2, VolumeX, Shield, RefreshCw, Edit2, Check, Palette } from 'lucide-react';
+import { X, Volume2, VolumeX, Shield, RefreshCw, Edit2, Check, Palette, Trash2 } from 'lucide-react';
 import { ProfileId, SquadState, ThemeId } from '../types';
 import { PROFILES } from '../data/profiles';
 import { FRIENDS_BY_PROFILE, FriendCharacter } from '../data/friends';
 import { soundFX } from '../services/soundEffects';
-import { updateCustomName, saveSquadState } from '../services/storage';
+import { updateCustomName, saveSquadState, resetAllProgress } from '../services/storage';
 import { ActivityHeatmap } from './ActivityHeatmap';
 
 interface SettingsModalProps {
@@ -138,6 +138,46 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [nameInput, setNameInput] = useState<string>(progress.name || config.name);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(soundFX.enabled);
   const [message, setMessage] = useState<string | null>(null);
+  const [adminClicks, setAdminClicks] = useState<number>(0);
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return (
+        window.location.search.includes('admin=1') ||
+        window.location.search.includes('admin=true')
+      );
+    }
+    return false;
+  });
+
+  const handleHeaderClick = () => {
+    const next = adminClicks + 1;
+    if (next >= 5) {
+      const newState = !isAdminUnlocked;
+      setIsAdminUnlocked(newState);
+      setAdminClicks(0);
+      soundFX.playCorrect();
+      setMessage(newState ? '🔓 Том ахын админ цэс нээгдлээ!' : 'Админ цэс хаагдлаа');
+      setTimeout(() => setMessage(null), 2500);
+    } else {
+      setAdminClicks(next);
+    }
+  };
+
+  const handleFullReset = async () => {
+    if (
+      !window.confirm(
+        'Та бүх 3 хүүхдийн датаг цэвэрлэж, 1-р өдрөөс цоо шинээр эхлүүлэхдээ итгэлтэй байна уу?'
+      )
+    ) {
+      return;
+    }
+    const fresh = await resetAllProgress(squadState.dedicatedProfileId);
+    onUpdateSquadState(fresh);
+    setMessage('Бүх дата амжилттай цэвэрлэгдлээ! 1-р өдрөөс шинээр эхэлж байна. 🚀');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1200);
+  };
 
   if (!isOpen) return null;
 
@@ -260,7 +300,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full max-h-[90vh] overflow-y-auto p-5 shadow-2xl space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
+          <div
+            onClick={handleHeaderClick}
+            className="flex items-center gap-2 cursor-pointer select-none active:opacity-80"
+            title="Тохиргоо"
+          >
             <Shield className="w-5 h-5 text-indigo-400" />
             <h3 className="text-base font-black text-white">
               Тохиргоо (Einstellungen)
@@ -490,39 +534,50 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         )}
 
-        {/* Admin Tools for Big Brother */}
-        <div className="pt-2 border-t border-slate-800 space-y-2">
-          <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-            <Shield className="w-3 h-3" />
-            Том ахын тохиргоо (Admin)
-          </div>
+        {/* Admin Tools for Big Brother (Completely invisible for children by default) */}
+        {isAdminUnlocked && (
+          <div className="pt-2 border-t border-amber-900/60 bg-amber-950/20 p-3 rounded-2xl border border-amber-500/30 space-y-2.5">
+            <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+              <span className="flex items-center gap-1">
+                <Shield className="w-3 h-3" />
+                Том ахын тохиргоо (Admin)
+              </span>
+              <span className="text-[9px] text-amber-500/80 font-mono">Нууц горим</span>
+            </div>
 
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
-            <div>
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
               <div className="text-xs font-semibold text-slate-200">
                 ⚡ 24 цагийн түгжээг унтраах
               </div>
+              <button
+                onClick={handleToggleTestMode}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                  squadState.testModeUnlocked
+                    ? 'bg-amber-500 text-slate-950 border-amber-400'
+                    : 'bg-slate-800 text-slate-400 border-slate-700'
+                }`}
+              >
+                {squadState.testModeUnlocked ? 'ИДЭВХТЭЙ' : 'УНТРААЛТТАЙ'}
+              </button>
             </div>
+
             <button
-              onClick={handleToggleTestMode}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
-                squadState.testModeUnlocked
-                  ? 'bg-amber-500 text-slate-950 border-amber-400'
-                  : 'bg-slate-800 text-slate-400 border-slate-700'
-              }`}
+              onClick={handleResetToday}
+              className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-300 border border-slate-700 flex items-center justify-center gap-1.5 transition-all"
             >
-              {squadState.testModeUnlocked ? 'ИДЭВХТЭЙ' : 'УНТРААЛТТАЙ'}
+              <RefreshCw className="w-3 h-3" />
+              Өнөөдрийн даалгаврыг дахин эхлүүлэх
+            </button>
+
+            <button
+              onClick={handleFullReset}
+              className="w-full py-2 px-3 rounded-xl bg-rose-950/70 hover:bg-rose-900/90 text-[11px] font-bold text-rose-300 border border-rose-800/80 flex items-center justify-center gap-1.5 transition-all"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Бүх датаг цэвэрлэж, 1-р өдрөөс шинээр эхлүүлэх
             </button>
           </div>
-
-          <button
-            onClick={handleResetToday}
-            className="w-full py-2 px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-[11px] font-semibold text-slate-300 border border-slate-700 flex items-center justify-center gap-1.5 transition-all"
-          >
-            <RefreshCw className="w-3 h-3" />
-            Өнөөдрийн даалгаврыг дахин эхлүүлэх
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );
