@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./icon-192.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="description" content="Täglich 1 Minute Deutsch A1.1 für Geschwister" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>Deutsch Minute - A1.1 Squad</title>
+  </head>
+  <body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch((err) => {
+            console.log('Service Worker registration failed:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

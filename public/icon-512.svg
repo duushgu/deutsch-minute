@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="50%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+    <linearGradient id="flag-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#6366f1" stroke-width="16" stroke-dasharray="8 8" opacity="0.4"/>
+  <!-- Speech Bubble -->
+  <path d="M140 180 C140 130 180 100 256 100 C332 100 372 130 372 180 C372 230 332 260 270 260 L220 300 L230 260 C160 260 140 230 140 180 Z" fill="#ffffff" opacity="0.95"/>
+  <!-- 1 Min Badge -->
+  <circle cx="340" cy="340" r="85" fill="url(#flag-gold)"/>
+  <text x="340" y="335" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="900" fill="#ffffff" text-anchor="middle">1</text>
+  <text x="340" y="375" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">MIN</text>
+  <!-- German Flag Accent in Speech Bubble -->
+  <rect x="206" y="155" width="100" height="15" rx="4" fill="#111827"/>
+  <rect x="206" y="172" width="100" height="15" rx="4" fill="#ef4444"/>
+  <rect x="206" y="189" width="100" height="15" rx="4" fill="#fbbf24"/>
+</svg>

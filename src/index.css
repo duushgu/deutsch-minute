@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+}
+
+/* Custom theme color palettes */
+.theme-kdrama {
+  --primary-glow: #ec4899;
+  --accent-color: #f43f5e;
+  --bubble-partner: #382947;
+  --bubble-user: #4c1d95;
+  --border-glow: #e879f9;
+}
+
+.theme-gamer {
+  --primary-glow: #06b6d4;
+  --accent-color: #10b981;
+  --bubble-partner: #0f2c42;
+  --bubble-user: #044e54;
+  --border-glow: #22d3ee;
+}
+
+.theme-cozy {
+  --primary-glow: #f59e0b;
+  --accent-color: #84cc16;
+  --bubble-partner: #3b2a1a;
+  --bubble-user: #14532d;
+  --border-glow: #fbbf24;
+}
+
+/* Pulsing glow animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.7);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite ease-in-out;
+}
