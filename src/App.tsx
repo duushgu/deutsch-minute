@@ -59,15 +59,16 @@ export const App: React.FC = () => {
   // Silent sync with Firebase Realtime Database
   useEffect(() => {
     let mounted = true;
-    syncWithCloud(squadState).then((latest) => {
-      if (mounted) setSquadState(latest);
-    });
 
     const handleSync = () => {
-      syncWithCloud(squadState).then((latest) => {
+      const currentLocal = loadSquadState();
+      syncWithCloud(currentLocal).then((latest) => {
         if (mounted) setSquadState(latest);
       });
     };
+
+    // Initial sync on mount
+    handleSync();
 
     window.addEventListener('focus', handleSync);
     const handleVisibility = () => {
@@ -91,7 +92,7 @@ export const App: React.FC = () => {
     }
     setActiveTab(tab);
     if (tab === 'squad') {
-      syncWithCloud(squadState).then(setSquadState);
+      syncWithCloud(loadSquadState()).then(setSquadState);
     }
   };
 

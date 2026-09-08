@@ -158,13 +158,15 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
             >
               <div>
                 <span className="text-xs font-bold text-amber-300 mr-2">
-                  {vocab.de}
+                  {formatDialogueText(vocab.de, config.name, userName, config.partnerName, partnerName)}
                 </span>
                 <span className="text-[11px] font-mono text-slate-400 mr-2">
-                  {vocab.ph}
+                  {formatDialogueText(vocab.ph, config.name, userName, config.partnerName, partnerName)}
                 </span>
               </div>
-              <span className="text-xs text-slate-300">{vocab.mn}</span>
+              <span className="text-xs text-slate-300">
+                {formatDialogueText(vocab.mn, config.name, userName, config.partnerName, partnerName)}
+              </span>
             </div>
           ))}
         </div>

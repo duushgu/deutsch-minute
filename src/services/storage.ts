@@ -133,6 +133,7 @@ export function updateOnboarding(
         partnerName: partnerName || profile.partnerName,
         partnerAvatar: partnerAvatar || profile.partnerAvatar,
         hasCompletedOnboarding: true,
+        lastActiveTimestamp: Date.now(),
       },
     },
   };
@@ -150,6 +151,7 @@ export function updateCustomName(state: SquadState, profileId: ProfileId, newNam
         ...profile,
         name: newName.trim() || profile.name,
         hasCompletedOnboarding: true,
+        lastActiveTimestamp: Date.now(),
       },
     },
   };
@@ -179,9 +181,32 @@ export function formatDialogueText(
 ): string {
   if (!text) return text;
   const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return text
-    .replace(new RegExp(escapeRegex(defaultUserName), 'g'), currentUserName)
-    .replace(new RegExp(escapeRegex(defaultPartnerName), 'g'), currentPartnerName);
+  const actualUser = currentUserName?.trim() || defaultUserName;
+  const actualPartner = currentPartnerName?.trim() || defaultPartnerName;
+
+  let res = text;
+  res = res.replace(/\{userName\}/g, actualUser);
+  res = res.replace(/\{partnerName\}/g, actualPartner);
+
+  if (defaultUserName) {
+    res = res.replace(new RegExp(escapeRegex(defaultUserName), 'g'), actualUser);
+  }
+  if (defaultPartnerName) {
+    res = res.replace(new RegExp(escapeRegex(defaultPartnerName), 'g'), actualPartner);
+  }
+
+  // Also replace any legacy names from earlier drafts
+  const legacyUserNames = ['Anu', 'Ану', 'Temuulen', 'Тэмүүлэн', 'Batu', 'Бату'];
+  for (const legacy of legacyUserNames) {
+    res = res.replace(new RegExp(escapeRegex(legacy), 'g'), actualUser);
+  }
+
+  const legacyPartnerNames = ['Min-jun', 'Мин-жүн', 'Saber', 'Сабер', 'Tanjiro', 'Танжиро'];
+  for (const legacy of legacyPartnerNames) {
+    res = res.replace(new RegExp(escapeRegex(legacy), 'g'), actualPartner);
+  }
+
+  return res;
 }
 
 export function isCompletedToday(progress: SiblingProgress, testModeUnlocked: boolean): boolean {
@@ -364,7 +389,7 @@ export async function syncWithCloud(currentState: SquadState): Promise<SquadStat
           };
           mergedProfiles[id] = mergedActive;
           hasChanges = true;
-        } else if (localDays > remoteDays || localTime > remoteTime) {
+        } else if (localDays > remoteDays || localTime > remoteTime || (!remote && local)) {
           // Local is ahead, push local to Firebase
           silentCloudSync(currentState).catch(() => {});
         }

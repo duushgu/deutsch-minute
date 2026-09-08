@@ -101,7 +101,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
 
   const handleCheckWordOrder = () => {
     const targetOrder = (turn2.challenge?.correctOrder || []).map((w) =>
-      w.replace(config.name, userName).replace(config.partnerName, partnerName)
+      formatDialogueText(w, config.name, userName, config.partnerName, partnerName)
     );
     const isMatch =
       selectedWords.length === targetOrder.length &&
