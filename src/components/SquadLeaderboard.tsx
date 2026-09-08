@@ -3,6 +3,7 @@ import { Users, Flame, CheckCircle2, Clock } from 'lucide-react';
 import { ProfileId, SquadState } from '../types';
 import { PROFILES } from '../data/profiles';
 import { isCompletedToday } from '../services/storage';
+import { getIstpRank, getIsfjHeroRank } from '../services/gamification';
 
 interface SquadLeaderboardProps {
   squadState: SquadState;
@@ -76,6 +77,27 @@ export const SquadLeaderboard: React.FC<SquadLeaderboardProps> = ({
                       {isCurrentActive && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 font-bold border border-emerald-800/60">
                           Чи
+                        </span>
+                      )}
+                    </div>
+                    {/* Personalized Gamification Subtitle */}
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      {id === 'brother1' && (
+                        <span className="text-cyan-400 font-medium flex items-center gap-1">
+                          <span>{getIstpRank(progress.completedDays?.length || 0, progress.xp || 0).tierBadge}</span>
+                          <span>{getIstpRank(progress.completedDays?.length || 0, progress.xp || 0).tierName}</span>
+                        </span>
+                      )}
+                      {id === 'brother2' && (
+                        <span className="text-emerald-400 font-medium flex items-center gap-1">
+                          <span>{getIsfjHeroRank(progress.completedDays?.length || 0, progress.partnerName).rankBadge}</span>
+                          <span>{getIsfjHeroRank(progress.completedDays?.length || 0, progress.partnerName).rankTitle.split('•')[0]}</span>
+                        </span>
+                      )}
+                      {id === 'sister' && (
+                        <span className="text-pink-400 font-medium flex items-center gap-1">
+                          <span>🌸</span>
+                          <span>{progress.completedDays?.length || 0}/10 дурсамж</span>
                         </span>
                       )}
                     </div>

@@ -28,12 +28,13 @@
   --border-glow: #22d3ee;
 }
 
+/* Demon Slayer & My Hero Academia Emerald Hero Palette */
 .theme-cozy {
-  --primary-glow: #f59e0b;
-  --accent-color: #84cc16;
-  --bubble-partner: #3b2a1a;
-  --bubble-user: #14532d;
-  --border-glow: #fbbf24;
+  --primary-glow: #10b981;
+  --accent-color: #f59e0b;
+  --bubble-partner: #064e3b;
+  --bubble-user: #065f46;
+  --border-glow: #34d399;
 }
 
 /* Pulsing glow animation */
@@ -50,4 +51,17 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes hero-spark {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4), 0 0 24px rgba(245, 158, 11, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.7), 0 0 35px rgba(245, 158, 11, 0.4);
+  }
+}
+
+.animate-hero-spark {
+  animation: hero-spark 2.5s infinite ease-in-out;
 }

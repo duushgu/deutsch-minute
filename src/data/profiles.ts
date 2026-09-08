@@ -37,7 +37,7 @@ export const PROFILES: Record<ProfileId, ProfileConfig> = {
     partnerRole: 'Үнэнч найз (Demon Slayer)',
     partnerAvatar: '🛡️',
     userAvatar: '🌿',
-    tagline: 'Нэгдэл, хамгаалалт & Адал явдал',
-    interests: ['Анимэ', 'Зураг зурах', 'Нөхөрлөл', 'Сургалт'],
+    tagline: 'Нэгдэл, хамгаалалт & Plus Ultra!',
+    interests: ['Demon Slayer', 'My Hero Academia', 'Нөхөрлөл', 'Сургалт'],
   },
 };

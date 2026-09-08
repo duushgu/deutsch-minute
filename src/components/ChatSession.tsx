@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { Volume2, CheckCircle2, ArrowRight, Sparkles, Zap, Shield, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DayLesson, ProfileConfig } from '../types';
 import { audioPlayer } from '../services/audioPlayer';
@@ -12,7 +12,7 @@ interface ChatSessionProps {
   userName: string;
   partnerName: string;
   partnerAvatar: string;
-  onComplete: (day: number) => void;
+  onComplete: (day: number, bonusXp?: number) => void;
 }
 
 export const ChatSession: React.FC<ChatSessionProps> = ({
@@ -153,6 +153,9 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     }
   };
 
+  const isSpeedBonus = config.id === 'brother1' && elapsedSeconds <= 25;
+  const bonusXp = isSpeedBonus ? 50 : 0;
+
   const handleFinishQuest = () => {
     soundFX.playVictory();
     confetti({
@@ -160,7 +163,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
       spread: 70,
       origin: { y: 0.6 },
     });
-    onComplete(lesson.day);
+    onComplete(lesson.day, bonusXp);
   };
 
   return (
@@ -172,9 +175,17 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
             {lesson.day}-р өдөр • {lesson.topic}
           </span>
-          <span className="font-bold text-amber-400">
-            {elapsedSeconds}s / 60s
-          </span>
+          <div className="flex items-center gap-2">
+            {config.id === 'brother1' && elapsedSeconds <= 25 && (
+              <span className="text-[10px] text-cyan-300 font-bold bg-cyan-950/80 px-2 py-0.5 rounded-full border border-cyan-800 animate-pulse flex items-center gap-1">
+                <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
+                Хурдны бонус (&lt;25с)
+              </span>
+            )}
+            <span className="font-bold text-amber-400">
+              {elapsedSeconds}s / 60s
+            </span>
+          </div>
         </div>
         {/* Progress Bar */}
         <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -400,13 +411,48 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
 
       {/* Completion Button Bar */}
       {currentStep >= 3 && (
-        <div className="mt-6 pt-3 border-t border-slate-800">
+        <div className="mt-6 pt-3 border-t border-slate-800 space-y-2">
+          {config.id === 'brother1' && isSpeedBonus && (
+            <div className="p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/50 text-center text-xs font-bold text-cyan-300 flex items-center justify-center gap-1.5 animate-pulse">
+              <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
+              ⚡ АЯНГЫН РЕФЛЕКС! ({elapsedSeconds}с) +50 Speed XP бонус олгогдоно!
+            </div>
+          )}
+
+          {config.id === 'brother2' && (
+            <div className="p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-center text-xs font-bold text-emerald-300 flex items-center justify-center gap-1.5">
+              <Shield className="w-4 h-4 text-emerald-400" />
+              Plus Ultra! 🌟 {partnerName}-тэй хамт өнөөдрийн бэлтгэл амжилттай боллоо!
+            </div>
+          )}
+
+          {config.id === 'sister' && (
+            <div className="p-2.5 rounded-xl bg-pink-950/80 border border-pink-500/50 text-center text-xs font-bold text-pink-300 flex items-center justify-center gap-1.5">
+              <Heart className="w-4 h-4 text-pink-400 fill-pink-400" />
+              🌸 {partnerName}-тэй хамт өдрийн нандин яриагаа амжилттай бүтээлээ!
+            </div>
+          )}
+
           <button
             onClick={handleFinishQuest}
-            className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-98 transition-all animate-pulse-glow"
+            className={`w-full py-3.5 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg active:scale-98 transition-all animate-pulse-glow ${
+              config.id === 'brother1'
+                ? 'bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 shadow-cyan-500/20'
+                : config.id === 'brother2'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20'
+                : 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 shadow-pink-500/20'
+            }`}
           >
-            <Sparkles className="w-5 h-5 text-amber-300" />
-            1 минутын даалгавар дуусгах! (+100 XP)
+            {config.id === 'brother1' ? (
+              <Zap className="w-5 h-5 text-amber-300" />
+            ) : config.id === 'brother2' ? (
+              <Shield className="w-5 h-5 text-amber-300" />
+            ) : (
+              <Sparkles className="w-5 h-5 text-amber-300" />
+            )}
+            {config.id === 'brother2'
+              ? `Бэлтгэл дуусгах! (+${100 + bonusXp} XP)`
+              : `1 минутын даалгавар дуусгах! (+${100 + bonusXp} XP)`}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

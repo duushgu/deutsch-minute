@@ -215,7 +215,12 @@ export function isCompletedToday(progress: SiblingProgress, testModeUnlocked: bo
   return progress.lastCompletedDate === getTodayDateString();
 }
 
-export function completeDayLesson(state: SquadState, profileId: ProfileId, day: number): SquadState {
+export function completeDayLesson(
+  state: SquadState,
+  profileId: ProfileId,
+  day: number,
+  bonusXp: number = 0
+): SquadState {
   const today = getTodayDateString();
   const profile = state.profiles[profileId];
 
@@ -236,11 +241,14 @@ export function completeDayLesson(state: SquadState, profileId: ProfileId, day: 
 
   const existingCompleted = Array.isArray(profile.completedDays) ? profile.completedDays : [];
   const completedDays = Array.from(new Set([...existingCompleted, day]));
-  const xp = (profile.xp || 0) + 100;
+  const xp = (profile.xp || 0) + 100 + bonusXp;
   const existingBadges = Array.isArray(profile.badges) ? profile.badges : [];
   const badges = [...existingBadges];
   if (day === 10 && !badges.includes('Phase 1 Champion')) {
     badges.push('Phase 1 Champion');
+  }
+  if (bonusXp > 0 && !badges.includes('Lightning Speed ⚡')) {
+    badges.push('Lightning Speed ⚡');
   }
 
   const updatedProfile: SiblingProgress = {

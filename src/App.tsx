@@ -96,8 +96,8 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleCompleteLesson = (day: number) => {
-    const updated = completeDayLesson(squadState, activeProfile, day);
+  const handleCompleteLesson = (day: number, bonusXp: number = 0) => {
+    const updated = completeDayLesson(squadState, activeProfile, day, bonusXp);
     setSquadState(updated);
   };
 
