@@ -1,0 +1,10 @@
+{
+  "name": "Жижгээ 🛡️ Герман хэл",
+  "short_name": "Жижгээ",
+  "start_url": "../jijgee/",
+  "scope": "../jijgee/",
+  "display": "standalone",
+  "background_color": "#1f1811",
+  "theme_color": "#f59e0b",
+  "icons": [{ "src": "../icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+}

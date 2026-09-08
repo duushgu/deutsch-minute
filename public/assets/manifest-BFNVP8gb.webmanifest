@@ -1,0 +1,10 @@
+{
+  "name": "Мөнгөнчимэг 🌸 Герман хэл",
+  "short_name": "Мөнгөнчимэг",
+  "start_url": "../mongonchimeg/",
+  "scope": "../mongonchimeg/",
+  "display": "standalone",
+  "background_color": "#241029",
+  "theme_color": "#ec4899",
+  "icons": [{ "src": "../icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+}

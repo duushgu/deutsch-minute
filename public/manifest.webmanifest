@@ -3,6 +3,7 @@
   "short_name": "Deutsch1Min",
   "description": "Täglich 1 Minute Deutsch A1.1 für Geschwister",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#3b82f6",

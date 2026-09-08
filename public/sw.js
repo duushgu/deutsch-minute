@@ -1,8 +1,15 @@
-const CACHE_NAME = 'deutsch-minute-v15';
+const CACHE_NAME = 'deutsch-minute-v16';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './404.html',
   './manifest.webmanifest',
+  './tomoo.webmanifest',
+  './jijgee.webmanifest',
+  './mongonchimeg.webmanifest',
+  './tomoo/index.html',
+  './jijgee/index.html',
+  './mongonchimeg/index.html',
   './icon-192.svg',
   './icon-512.svg',
 ];
@@ -10,7 +17,9 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return Promise.allSettled(
+        ASSETS_TO_CACHE.map((url) => cache.add(url).catch(() => {}))
+      );
     })
   );
   self.skipWaiting();
@@ -37,7 +46,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. NEVER intercept external API calls (e.g. Firebase RTDB, local daemon)
+  // 2. NEVER intercept external API calls (e.g. Firebase RTDB, Google TTS)
   if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
@@ -52,6 +61,10 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
+          // If server returned 404 for /assets/ or broken path, recover gracefully
+          if (networkResponse.status === 404 && url.pathname.includes('/assets')) {
+            return caches.match('./404.html').then((fallback) => fallback || Response.redirect(self.location.origin + '/deutsch-minute/', 302));
+          }
           if (networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
@@ -62,7 +75,17 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           return caches.match(event.request).then((cached) => {
-            return cached || caches.match('./index.html');
+            if (cached) return cached;
+            if (url.pathname.includes('tomoo')) {
+              return caches.match('./tomoo/index.html');
+            }
+            if (url.pathname.includes('jijgee')) {
+              return caches.match('./jijgee/index.html');
+            }
+            if (url.pathname.includes('mongonchimeg')) {
+              return caches.match('./mongonchimeg/index.html');
+            }
+            return caches.match('./index.html');
           });
         })
     );

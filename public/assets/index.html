@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <title>Deutsch Minute</title>
+  <script>
+    (function() {
+      try {
+        var p = localStorage.getItem('dm_active_profile');
+        if (p === 'brother1') { window.location.replace('../tomoo/'); return; }
+        if (p === 'brother2') { window.location.replace('../jijgee/'); return; }
+        if (p === 'sister') { window.location.replace('../mongonchimeg/'); return; }
+      } catch (e) {}
+      window.location.replace('../');
+    })();
+  </script>
+</head>
+<body style="background:#0f172a;color:#94a3b8;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui,sans-serif;">
+  <p>Ачааллаж байна...</p>
+</body>
+</html>
