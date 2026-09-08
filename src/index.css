@@ -37,6 +37,15 @@
   --border-glow: #34d399;
 }
 
+/* Clean standard theme (default dark mode, minimal distraction) */
+.theme-standard {
+  --primary-glow: #6366f1;
+  --accent-color: #3b82f6;
+  --bubble-partner: rgba(30, 41, 59, 0.85);
+  --bubble-user: rgba(30, 58, 138, 0.85);
+  --border-glow: #818cf8;
+}
+
 /* 1. Slow ambient aura pulsing & drift */
 @keyframes aura-slow {
   0%, 100% {

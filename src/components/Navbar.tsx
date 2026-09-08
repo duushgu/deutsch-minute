@@ -24,21 +24,27 @@ export const Navbar: React.FC<NavbarProps> = ({
       ? 'bg-[#13081e]/80 border-pink-900/40 shadow-lg shadow-pink-950/20'
       : config.theme === 'gamer'
       ? 'bg-[#030914]/85 border-cyan-900/40 shadow-lg shadow-cyan-950/20'
-      : 'bg-[#021610]/85 border-emerald-900/40 shadow-lg shadow-emerald-950/20';
+      : config.theme === 'cozy'
+      ? 'bg-[#021610]/85 border-emerald-900/40 shadow-lg shadow-emerald-950/20'
+      : 'bg-slate-950/85 border-slate-800 shadow-lg shadow-black/20';
 
   const avatarBgClass =
     config.theme === 'kdrama'
       ? 'bg-pink-600/20 border-pink-500/40 text-pink-200'
       : config.theme === 'gamer'
       ? 'bg-cyan-600/20 border-cyan-500/40 text-cyan-200'
-      : 'bg-emerald-600/20 border-emerald-500/40 text-emerald-200';
+      : config.theme === 'cozy'
+      ? 'bg-emerald-600/20 border-emerald-500/40 text-emerald-200'
+      : 'bg-indigo-600/20 border-indigo-500/40 text-indigo-200';
 
   const tabActiveClass =
     config.theme === 'kdrama'
       ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-md shadow-pink-600/40'
       : config.theme === 'gamer'
       ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-600/40'
-      : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/40';
+      : config.theme === 'cozy'
+      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/40'
+      : 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-600/40';
 
   return (
     <header className={`sticky top-0 z-40 backdrop-blur-xl border-b px-4 py-2.5 transition-all ${headerBgClass}`}>

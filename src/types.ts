@@ -5,7 +5,7 @@ export interface ProfileConfig {
   name: string;
   age: number;
   title: string;
-  theme: 'kdrama' | 'gamer' | 'cozy';
+  theme: ThemeId;
   partnerName: string;
   partnerRole: string;
   partnerAvatar: string;
@@ -57,7 +57,7 @@ export interface DayLesson {
   keyVocab: KeyVocab[];
 }
 
-export type ThemeId = 'kdrama' | 'gamer' | 'cozy';
+export type ThemeId = 'kdrama' | 'gamer' | 'cozy' | 'standard';
 
 export interface SiblingProgress {
   profileId: ProfileId;

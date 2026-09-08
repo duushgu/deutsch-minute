@@ -167,30 +167,47 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
 
   const isKdrama = config.theme === 'kdrama';
   const isGamer = config.theme === 'gamer';
+  const isCozy = config.theme === 'cozy';
+
+  const avatarBorderClass = isKdrama
+    ? 'bg-pink-950/80 border-pink-500/40'
+    : isGamer
+    ? 'bg-cyan-950/80 border-cyan-500/40'
+    : isCozy
+    ? 'bg-emerald-950/80 border-emerald-500/40'
+    : 'bg-slate-900 border-slate-700';
 
   const timerCardClass = isKdrama
     ? 'bg-[#180b26]/80 border-pink-900/50 shadow-pink-950/20'
     : isGamer
     ? 'bg-[#040c1b]/85 border-cyan-900/50 shadow-cyan-950/20'
-    : 'bg-[#031d15]/85 border-emerald-900/50 shadow-emerald-950/20';
+    : isCozy
+    ? 'bg-[#031d15]/85 border-emerald-900/50 shadow-emerald-950/20'
+    : 'bg-slate-900/85 border-slate-800 shadow-slate-950/20';
 
   const partnerBubbleClass = isKdrama
     ? 'bg-[#1e0d2e]/85 border-pink-500/30 shadow-pink-950/20'
     : isGamer
     ? 'bg-[#06172a]/85 border-cyan-500/30 shadow-cyan-950/20'
-    : 'bg-[#05281e]/85 border-emerald-500/40 shadow-emerald-950/20';
+    : isCozy
+    ? 'bg-[#05281e]/85 border-emerald-500/40 shadow-emerald-950/20'
+    : 'bg-slate-800/85 border-slate-700/60 shadow-slate-950/20';
 
   const userBubbleClass = isKdrama
     ? 'bg-[#29103c]/90 border-pink-500/40 shadow-pink-500/10'
     : isGamer
     ? 'bg-[#08223d]/90 border-cyan-500/50 shadow-cyan-500/15'
-    : 'bg-[#063828]/90 border-emerald-400/50 shadow-emerald-500/15';
+    : isCozy
+    ? 'bg-[#063828]/90 border-emerald-400/50 shadow-emerald-500/15'
+    : 'bg-indigo-950/90 border-indigo-500/40 shadow-indigo-500/10';
 
   const actionBtnClass = isKdrama
     ? 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white shadow-pink-500/30'
     : isGamer
     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-cyan-500/30'
-    : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/30';
+    : isCozy
+    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/30'
+    : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-indigo-500/30';
 
   return (
     <div className="max-w-md mx-auto p-4 pb-20 flex flex-col min-h-[calc(100vh-110px)]">
@@ -229,9 +246,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
       <div className="space-y-4 flex-1">
         {/* Turn 1: Partner Bubble */}
         <div className="flex items-start gap-2.5">
-          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${
-            isKdrama ? 'bg-pink-950/80 border-pink-500/40' : isGamer ? 'bg-cyan-950/80 border-cyan-500/40' : 'bg-emerald-950/80 border-emerald-500/40'
-          }`}>
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${avatarBorderClass}`}>
             {partnerAvatar}
           </div>
           <div className={`flex-1 rounded-2xl rounded-tl-sm p-3.5 shadow-md backdrop-blur-md transition-all ${partnerBubbleClass}`}>
@@ -394,9 +409,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         {/* Partner Typing Indicator */}
         {isPartnerTyping && currentStep === 2 && (
           <div className="flex items-center gap-2.5 animate-pulse">
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${
-              isKdrama ? 'bg-pink-950/80 border-pink-500/40' : isGamer ? 'bg-cyan-950/80 border-cyan-500/40' : 'bg-emerald-950/80 border-emerald-500/40'
-            }`}>
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${avatarBorderClass}`}>
               {partnerAvatar}
             </div>
             <div className={`rounded-2xl rounded-tl-sm px-4 py-2.5 shadow-md flex items-center gap-2 backdrop-blur-md transition-all ${partnerBubbleClass}`}>
@@ -415,9 +428,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         {/* Turn 3: Partner Closing Reply */}
         {currentStep >= 3 && (
           <div className="flex items-start gap-2.5 animate-fadeIn">
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${
-              isKdrama ? 'bg-pink-950/80 border-pink-500/40' : isGamer ? 'bg-cyan-950/80 border-cyan-500/40' : 'bg-emerald-950/80 border-emerald-500/40'
-            }`}>
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow shrink-0 border ${avatarBorderClass}`}>
               {partnerAvatar}
             </div>
             <div className={`flex-1 rounded-2xl rounded-tl-sm p-3.5 shadow-md backdrop-blur-md transition-all ${partnerBubbleClass}`}>

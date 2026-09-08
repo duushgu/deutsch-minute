@@ -61,24 +61,31 @@ export const LockoutScreen: React.FC<LockoutScreenProps> = ({
 
   const isKdrama = config.theme === 'kdrama';
   const isGamer = config.theme === 'gamer';
+  const isCozy = config.theme === 'cozy';
 
   const lockoutHeaderClass = isKdrama
     ? 'bg-gradient-to-b from-[#1c0d2e]/90 to-[#2f1345]/70 border-pink-500/40 shadow-pink-950/30'
     : isGamer
     ? 'bg-gradient-to-b from-[#051329]/90 to-[#022a45]/70 border-cyan-500/40 shadow-cyan-950/30'
-    : 'bg-gradient-to-b from-[#04241b]/90 to-[#033b28]/70 border-emerald-500/40 shadow-emerald-950/30';
+    : isCozy
+    ? 'bg-gradient-to-b from-[#04241b]/90 to-[#033b28]/70 border-emerald-500/40 shadow-emerald-950/30'
+    : 'bg-gradient-to-b from-slate-900/90 to-slate-950/70 border-slate-700/60 shadow-slate-950/30';
 
   const cardBaseClass = isKdrama
     ? 'bg-[#150924]/80 border-pink-900/40 shadow-pink-950/20'
     : isGamer
     ? 'bg-[#030e1f]/80 border-cyan-900/40 shadow-cyan-950/20'
-    : 'bg-[#021812]/80 border-emerald-900/40 shadow-emerald-950/20';
+    : isCozy
+    ? 'bg-[#021812]/80 border-emerald-900/40 shadow-emerald-950/20'
+    : 'bg-slate-900/80 border-slate-800 shadow-slate-950/20';
 
   const rowBaseClass = isKdrama
     ? 'bg-[#220d36]/70 border-pink-950/60'
     : isGamer
     ? 'bg-[#061830]/70 border-cyan-950/60'
-    : 'bg-[#04291f]/70 border-emerald-950/60';
+    : isCozy
+    ? 'bg-[#04291f]/70 border-emerald-950/60'
+    : 'bg-slate-900/70 border-slate-800';
 
   return (
     <div className="max-w-md mx-auto p-4 pb-24 space-y-4">

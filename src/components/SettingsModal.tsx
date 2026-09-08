@@ -13,43 +13,72 @@ interface SettingsModalProps {
   onUpdateSquadState: (newState: SquadState) => void;
 }
 
-const THEME_OPTIONS: Array<{
-  id: ThemeId;
-  title: string;
-  icon: string;
-  description: string;
-  dotClass: string;
-  selectedBorderClass: string;
-  selectedBgClass: string;
-}> = [
-  {
-    id: 'cozy',
-    title: 'Demon Slayer & My Hero Academia',
-    icon: '🛡️',
-    description: 'Ногоон хаори хээ, баатрын энерги, амьсгалын зэрэг',
-    dotClass: 'bg-emerald-400 border-emerald-300 shadow-[0_0_8px_#10b981]',
-    selectedBorderClass: 'border-emerald-500/80 shadow-emerald-500/20',
-    selectedBgClass: 'bg-emerald-950/60',
-  },
-  {
-    id: 'gamer',
-    title: 'Mobile Legends Cyber Arena',
-    icon: '⚡',
-    description: 'Кибер тактик, неон цэнхэр гэрэл, сканлайн шугам',
-    dotClass: 'bg-cyan-400 border-cyan-300 shadow-[0_0_8px_#06b6d4]',
-    selectedBorderClass: 'border-cyan-500/80 shadow-cyan-500/20',
-    selectedBgClass: 'bg-cyan-950/60',
-  },
-  {
-    id: 'kdrama',
-    title: 'K-Drama & Aesthetic Twilight',
-    icon: '🌸',
-    description: 'Сакура цэцгийн дэлбээ, ягаан туяа, өдрийн дурсамж',
-    dotClass: 'bg-pink-400 border-pink-300 shadow-[0_0_8px_#ec4899]',
-    selectedBorderClass: 'border-pink-500/80 shadow-pink-500/20',
-    selectedBgClass: 'bg-pink-950/60',
-  },
-];
+const PROFILE_THEMES: Record<
+  ProfileId,
+  Array<{
+    id: ThemeId;
+    title: string;
+    icon: string;
+    dotClass: string;
+    selectedBorderClass: string;
+    selectedBgClass: string;
+  }>
+> = {
+  sister: [
+    {
+      id: 'kdrama',
+      title: 'K-Drama & Twilight (Тусгай)',
+      icon: '🌸',
+      dotClass: 'bg-pink-400 border-pink-300 shadow-[0_0_8px_#ec4899]',
+      selectedBorderClass: 'border-pink-500/80 shadow-pink-500/20',
+      selectedBgClass: 'bg-pink-950/60',
+    },
+    {
+      id: 'standard',
+      title: 'Стандарт (Энгийн цэвэрхэн)',
+      icon: '🌙',
+      dotClass: 'bg-slate-400 border-slate-300',
+      selectedBorderClass: 'border-indigo-500/80 shadow-indigo-500/20',
+      selectedBgClass: 'bg-slate-900',
+    },
+  ],
+  brother1: [
+    {
+      id: 'gamer',
+      title: 'Mobile Legends Arena (Тусгай)',
+      icon: '⚡',
+      dotClass: 'bg-cyan-400 border-cyan-300 shadow-[0_0_8px_#06b6d4]',
+      selectedBorderClass: 'border-cyan-500/80 shadow-cyan-500/20',
+      selectedBgClass: 'bg-cyan-950/60',
+    },
+    {
+      id: 'standard',
+      title: 'Стандарт (Энгийн цэвэрхэн)',
+      icon: '🌙',
+      dotClass: 'bg-slate-400 border-slate-300',
+      selectedBorderClass: 'border-indigo-500/80 shadow-indigo-500/20',
+      selectedBgClass: 'bg-slate-900',
+    },
+  ],
+  brother2: [
+    {
+      id: 'cozy',
+      title: 'Demon Slayer & MHA (Тусгай)',
+      icon: '🛡️',
+      dotClass: 'bg-emerald-400 border-emerald-300 shadow-[0_0_8px_#10b981]',
+      selectedBorderClass: 'border-emerald-500/80 shadow-emerald-500/20',
+      selectedBgClass: 'bg-emerald-950/60',
+    },
+    {
+      id: 'standard',
+      title: 'Стандарт (Энгийн цэвэрхэн)',
+      icon: '🌙',
+      dotClass: 'bg-slate-400 border-slate-300',
+      selectedBorderClass: 'border-indigo-500/80 shadow-indigo-500/20',
+      selectedBgClass: 'bg-slate-900',
+    },
+  ],
+};
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
@@ -61,6 +90,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const config = PROFILES[activeId];
   const progress = squadState.profiles[activeId];
   const friendsList = FRIENDS_BY_PROFILE[activeId] || [];
+  const availableThemes = PROFILE_THEMES[activeId] || [];
 
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [isChoosingFriend, setIsChoosingFriend] = useState<boolean>(false);
@@ -74,7 +104,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     progress.showPhoneticsArchiveDays1to5 ?? squadState.showPhoneticsArchiveDays1to5
   );
 
-  const effectiveTheme: ThemeId = progress.customTheme || config.theme || 'gamer';
+  const effectiveTheme: ThemeId = progress.customTheme || config.theme || 'standard';
 
   const handleToggleSound = () => {
     soundFX.enabled = !soundFX.enabled;
@@ -265,13 +295,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-lg">{progress.partnerAvatar || config.partnerAvatar}</span>
-              <div>
-                <div className="text-xs font-bold text-white">
-                  Хамтрагч: {progress.partnerName || config.partnerName}
-                </div>
-                <div className="text-[10px] text-slate-400">
-                  Германаар ярилцах найз
-                </div>
+              <div className="text-xs font-bold text-white">
+                Хамтрагч: {progress.partnerName || config.partnerName}
               </div>
             </div>
 
@@ -308,19 +333,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* ================================================================= */}
-        {/* NEW SETTING 1: Phonetics only in Archive for Days 1 to 5          */}
+        {/* SETTING 1: Phonetics only in Archive for Days 1 to 5              */}
         {/* ================================================================= */}
         <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-          <div className="pr-3">
-            <div className="text-xs font-bold text-white flex items-center gap-1.5">
-              <span>Авиа дуудлагын галиг</span>
-              <span className="text-[10px] text-amber-400 bg-amber-950/70 border border-amber-800/60 px-1.5 py-0.2 rounded font-mono">
-                Архивт 1-5 өдөр
-              </span>
-            </div>
-            <div className="text-[10px] text-slate-400 mt-0.5">
-              Зөвхөн архивын эхний 5 хичээлд герман дуудлагын монгол галиг харуулах
-            </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-bold text-white">Авиа дуудлагын галиг</span>
+            <span className="text-[10px] text-amber-400 bg-amber-950/70 border border-amber-800/60 px-1.5 py-0.5 rounded font-mono">
+              Архивт 1-5 өдөр
+            </span>
           </div>
           <button
             onClick={handleTogglePhoneticsArchive}
@@ -335,21 +355,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* ================================================================= */}
-        {/* NEW SETTING 2: Theme Selection List                              */}
+        {/* SETTING 2: Profile Theme Selection                                */}
         {/* ================================================================= */}
         <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2">
-          <div>
-            <div className="text-xs font-bold text-white flex items-center gap-1.5">
-              <Palette className="w-4 h-4 text-indigo-400" />
-              <span>Үндсэн загвар сонгох (Theme)</span>
-            </div>
-            <div className="text-[10px] text-slate-400">
-              Арын дэвсгэрийн хөдөлгөөн ба өнгө төрхийг өөрийн хүссэнээр солих
-            </div>
+          <div className="text-xs font-bold text-white flex items-center gap-1.5">
+            <Palette className="w-4 h-4 text-indigo-400" />
+            <span>Загвар сонгох (Theme)</span>
           </div>
 
-          <div className="space-y-1.5 pt-1">
-            {THEME_OPTIONS.map((t) => {
+          <div className="space-y-1.5 pt-0.5">
+            {availableThemes.map((t) => {
               const isSelected = effectiveTheme === t.id;
               return (
                 <button
@@ -363,18 +378,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 >
                   <div className="flex items-center gap-2.5">
                     <span className="text-xl">{t.icon}</span>
-                    <div>
-                      <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                        <span>{t.title}</span>
-                        {isSelected && (
-                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-white/20 text-white font-mono">
-                            Сонгогдсон
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[10px] text-slate-400">
-                        {t.description}
-                      </div>
+                    <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <span>{t.title}</span>
+                      {isSelected && (
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-white/20 text-white font-mono">
+                          Сонгогдсон
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className={`w-3.5 h-3.5 rounded-full border ${t.dotClass}`} />
@@ -386,12 +396,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Audio / SFX Toggle */}
         <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-          <div>
-            <div className="text-xs font-bold text-white">Дууны эффект</div>
-            <div className="text-[10px] text-slate-400">
-              Товчлуур дарах, зөв хариулах чимээ
-            </div>
-          </div>
+          <div className="text-xs font-bold text-white">Дууны эффект</div>
           <button
             onClick={handleToggleSound}
             className={`p-2 rounded-xl border transition-all ${

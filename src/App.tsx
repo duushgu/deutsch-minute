@@ -132,7 +132,7 @@ export const App: React.FC = () => {
   const themeClass = `theme-${effectiveTheme}`;
 
   return (
-    <div className={`min-h-screen text-slate-100 flex flex-col relative overflow-x-hidden ${themeClass}`}>
+    <div className={`min-h-screen bg-slate-950 text-slate-100 flex flex-col relative overflow-x-hidden ${themeClass}`}>
       {/* Animated Immersive Theme Environment Background */}
       <ThemeBackground theme={effectiveTheme} />
 

@@ -1,10 +1,15 @@
 import React from 'react';
+import { ThemeId } from '../types';
 
 interface ThemeBackgroundProps {
-  theme: 'kdrama' | 'gamer' | 'cozy';
+  theme: ThemeId;
 }
 
 export const ThemeBackground: React.FC<ThemeBackgroundProps> = ({ theme }) => {
+  if (theme === 'standard') {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
       {/* ========================================================================= */}

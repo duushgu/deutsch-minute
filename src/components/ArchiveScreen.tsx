@@ -32,24 +32,31 @@ export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
 
   const isKdrama = config.theme === 'kdrama';
   const isGamer = config.theme === 'gamer';
+  const isCozy = config.theme === 'cozy';
 
   const headerClass = isKdrama
     ? 'bg-[#180b26]/85 border-pink-900/40 shadow-pink-950/20'
     : isGamer
     ? 'bg-[#040e1f]/85 border-cyan-900/40 shadow-cyan-950/20'
-    : 'bg-[#021812]/85 border-emerald-900/40 shadow-emerald-950/20';
+    : isCozy
+    ? 'bg-[#021812]/85 border-emerald-900/40 shadow-emerald-950/20'
+    : 'bg-slate-900/85 border-slate-800 shadow-slate-950/20';
 
   const completedCardClass = isKdrama
     ? 'bg-[#1b0d2d]/80 border-pink-900/50'
     : isGamer
     ? 'bg-[#051428]/80 border-cyan-900/50'
-    : 'bg-[#032017]/80 border-emerald-900/50';
+    : isCozy
+    ? 'bg-[#032017]/80 border-emerald-900/50'
+    : 'bg-slate-900/80 border-slate-800';
 
   const currentCardClass = isKdrama
     ? 'bg-[#260f3a]/90 border-pink-500/60 shadow-md shadow-pink-500/20'
     : isGamer
     ? 'bg-[#061b34]/90 border-cyan-500/60 shadow-md shadow-cyan-500/20'
-    : 'bg-[#04291f]/90 border-emerald-500/60 shadow-md shadow-emerald-500/20';
+    : isCozy
+    ? 'bg-[#04291f]/90 border-emerald-500/60 shadow-md shadow-emerald-500/20'
+    : 'bg-slate-900/90 border-indigo-500/60 shadow-md shadow-indigo-500/20';
 
   return (
     <div className="max-w-md mx-auto p-4 pb-24 space-y-4">
