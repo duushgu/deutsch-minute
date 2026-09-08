@@ -493,10 +493,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                                     : ''
                                 } ${draggedWordIdx === idx ? 'opacity-40 scale-95' : 'opacity-100'}`}
                               >
-                                <span className="flex items-center gap-1">
-                                  <span className="text-[10px] opacity-60">⋮⋮</span>
-                                  {word}
-                                </span>
+                                {word}
                               </button>
                             ))
                           )}

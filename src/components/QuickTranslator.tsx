@@ -1,15 +1,23 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Volume2, PenTool, BookMarked, Trash2, Plus } from 'lucide-react';
 import { CURRICULUM } from '../data/curriculum';
 import { ProfileId, ThemeId } from '../types';
+import { audioPlayer } from '../services/audioPlayer';
 
 interface QuickTranslatorProps {
   profileId: ProfileId;
   theme: ThemeId;
 }
 
+interface DictItem {
+  de: string;
+  mn: string;
+  category?: string;
+  audioKey?: string;
+}
+
 // Built-in everyday vocabulary for teens (School, gaming, food, daily life)
-const BASE_DICTIONARY: Array<{ de: string; mn: string; category?: string }> = [
+const BASE_DICTIONARY: DictItem[] = [
   // Greetings & Basics
   { de: 'Hallo!', mn: 'Сайн уу!', category: 'Мэндчилгээ' },
   { de: 'Guten Morgen!', mn: 'Өглөөний мэнд!', category: 'Мэндчилгээ' },
@@ -71,6 +79,7 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
   const [activeTab, setActiveTab] = useState<'translate' | 'notes'>('translate');
   const [searchTerm, setSearchTerm] = useState('');
   const [noteInput, setNoteInput] = useState('');
+  const [playingWord, setPlayingWord] = useState<string | null>(null);
   const [savedNotes, setSavedNotes] = useState<string[]>(() => {
     try {
       const stored = localStorage.getItem(`dm_notes_${profileId}`);
@@ -83,9 +92,16 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
     }
   });
 
-  // Combine curriculum vocab with base dictionary
+  // Stop audio on unmount
+  useEffect(() => {
+    return () => {
+      audioPlayer.stop();
+    };
+  }, []);
+
+  // Combine curriculum vocab & dialogue with base dictionary
   const fullDictionary = useMemo(() => {
-    const map = new Map<string, { de: string; mn: string; category?: string }>();
+    const map = new Map<string, DictItem>();
 
     // Add all curriculum key vocab
     const lessons = CURRICULUM[profileId] || [];
@@ -98,6 +114,20 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
             de: cleanDe,
             mn: cleanMn,
             category: `${l.day}-р өдөр`,
+          });
+        }
+      });
+
+      // Add key dialogue sentences with pre-recorded audioKey
+      l.dialogue?.forEach((d) => {
+        const cleanDe = d.textDe.replace(/\{.*?\}/g, '').trim();
+        const cleanMn = d.textMn.replace(/\{.*?\}/g, '').trim();
+        if (cleanDe && !map.has(cleanDe.toLowerCase()) && cleanDe.length < 50) {
+          map.set(cleanDe.toLowerCase(), {
+            de: cleanDe,
+            mn: cleanMn,
+            category: `${l.day}-р өдөр`,
+            audioKey: d.audioKey,
           });
         }
       });
@@ -126,15 +156,17 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
       .slice(0, 15);
   }, [searchTerm, fullDictionary]);
 
-  // Speak German text with Web Speech API
-  const speakGerman = (text: string) => {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const cleanText = text.replace(/\{.*?\}/g, '').replace(/[\/()]/g, ' ').trim();
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'de-DE';
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
+  // Universal German audio player (Local Studio MP3 -> Google TTS -> Web Speech)
+  const speakGerman = async (text: string, audioKey?: string) => {
+    if (!text.trim()) return;
+    setPlayingWord(text);
+    try {
+      await audioPlayer.speak(text, audioKey);
+    } finally {
+      setTimeout(() => {
+        setPlayingWord((curr) => (curr === text ? null : curr));
+      }, 1200);
+    }
   };
 
   // Add custom note
@@ -204,10 +236,14 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
             {searchTerm.trim() && (
               <button
                 onClick={() => speakGerman(searchTerm)}
-                className="absolute right-2 top-1.5 px-2 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 text-[10px] font-bold flex items-center gap-1 border border-indigo-500/40"
+                className={`absolute right-2 top-1.5 px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 border transition-all ${
+                  playingWord === searchTerm
+                    ? 'bg-amber-500/30 text-amber-300 border-amber-500/50 ring-1 ring-amber-400'
+                    : 'bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border-indigo-500/40'
+                }`}
                 title="Энэ үгийг германаар унших"
               >
-                <Volume2 className="w-3 h-3" />
+                <Volume2 className={`w-3 h-3 ${playingWord === searchTerm ? 'animate-pulse text-amber-300' : ''}`} />
                 Сонсох
               </button>
             )}
@@ -234,11 +270,15 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
                   </div>
 
                   <button
-                    onClick={() => speakGerman(item.de)}
-                    className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all active:scale-95 shrink-0"
+                    onClick={() => speakGerman(item.de, item.audioKey)}
+                    className={`p-2 rounded-xl border transition-all active:scale-95 shrink-0 ${
+                      playingWord === item.de
+                        ? 'bg-amber-500/30 border-amber-500 text-amber-300 ring-2 ring-amber-400/50'
+                        : 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700'
+                    }`}
                     title="Дуудлага сонсох"
                   >
-                    <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                    <Volume2 className={`w-3.5 h-3.5 ${playingWord === item.de ? 'text-amber-300 animate-pulse' : 'text-amber-400'}`} />
                   </button>
                 </div>
               ))
@@ -247,9 +287,13 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
                 <p className="text-xs text-slate-400">"{searchTerm}" олдсонгүй.</p>
                 <button
                   onClick={() => speakGerman(searchTerm)}
-                  className="px-3 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/40 text-xs font-semibold inline-flex items-center gap-1.5"
+                  className={`px-3 py-1.5 rounded-xl border text-xs font-semibold inline-flex items-center gap-1.5 transition-all ${
+                    playingWord === searchTerm
+                      ? 'bg-amber-500/30 text-amber-300 border-amber-500/50 ring-1 ring-amber-400'
+                      : 'bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border-indigo-500/40'
+                  }`}
                 >
-                  <Volume2 className="w-3.5 h-3.5" />
+                  <Volume2 className={`w-3.5 h-3.5 ${playingWord === searchTerm ? 'animate-pulse text-amber-300' : ''}`} />
                   Германаар яаж уншихыг сонсох
                 </button>
               </div>
@@ -289,9 +333,9 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
             {noteInput.trim() && (
               <button
                 onClick={() => speakGerman(noteInput)}
-                className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+                className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 transition-all"
               >
-                <Volume2 className="w-3.5 h-3.5" />
+                <Volume2 className={`w-3.5 h-3.5 ${playingWord === noteInput ? 'animate-pulse text-amber-300' : ''}`} />
                 Бичсэн өгүүлбэрээ дуудуулж сонсох 🔊
               </button>
             )}
@@ -313,10 +357,14 @@ export const QuickTranslator: React.FC<QuickTranslatorProps> = ({ profileId }) =
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => speakGerman(note)}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700"
+                    className={`p-1.5 rounded-lg border transition-all ${
+                      playingWord === note
+                        ? 'bg-amber-500/30 border-amber-500 text-amber-300 ring-1 ring-amber-400'
+                        : 'bg-slate-800 hover:bg-slate-700 text-amber-400 border-slate-700'
+                    }`}
                     title="Сонсох"
                   >
-                    <Volume2 className="w-3 h-3" />
+                    <Volume2 className={`w-3 h-3 ${playingWord === note ? 'animate-pulse text-amber-300' : ''}`} />
                   </button>
                   <button
                     onClick={() => handleDeleteNote(idx)}
